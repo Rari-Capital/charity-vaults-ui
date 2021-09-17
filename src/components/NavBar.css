@@ -39,6 +39,24 @@
   display: flex;
 }
 
+.nav-button {
+  background-color: #41c345;
+  border-radius: 10px;
+}
+
+.button-links:hover {
+  color: black;
+}
+
+.nav-button-item {
+    line-height: 40px;
+    margin-right: 1rem;
+}
+
+.nav-button-item .active {
+    text-decoration: underline;
+}
+
 .nav-menu {
   display: flex;
   list-style: none;
@@ -109,6 +127,14 @@
     padding: 1.5rem;
     width: 100%;
     display: table;
+  }
+  .nav-button-item {
+    margin-right: 1rem;
+    margin-left: 1rem;
+    margin-top: 5px;
+  }
+  .button-links {
+    padding: 1.5rem;
   }
 
   .nav-icon {
