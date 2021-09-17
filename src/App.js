@@ -13,13 +13,15 @@ function App() {
       <Router>
         <NavBar />
 
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route path="/create" component={Create} />
-          <Route path="/deposit" component={Deposit} />
-          <Route path="/withdraw" component={Withdraw} />
-          <Route path="/connect" component={Connect} />
-        </Switch>
+        <div className="pages">
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route path="/create" component={Create} />
+            <Route path="/deposit" component={Deposit} />
+            <Route path="/withdraw" component={Withdraw} />
+            <Route path="/connect" component={Connect} />
+          </Switch>
+        </div>
       </Router>
     </>
   );
