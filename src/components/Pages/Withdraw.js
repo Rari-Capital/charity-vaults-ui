@@ -1,10 +1,12 @@
 import React from 'react'
+import Page from "../Page/Page"
+
 
 function Withdraw() {
     return (
-        <div>
+        <Page>
             <h1>Withdraw</h1>
-        </div>
+        </Page>
     )
 }
 

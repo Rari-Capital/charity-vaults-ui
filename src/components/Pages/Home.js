@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import Button from "../Button"
+import Button from "../Button/Button"
+import Page from "../Page/Page"
 import "./Home.css"
 
 
@@ -10,7 +11,7 @@ function Home() {
     }
 
     return (
-        <div className="home-container">
+        <Page>
             <div className="home-header-container">
 
             </div>
@@ -28,7 +29,7 @@ function Home() {
                     <Button>Get Started</Button>
                 </NavLink>
             </div>
-        </div>
+        </Page>
     )
 }
 

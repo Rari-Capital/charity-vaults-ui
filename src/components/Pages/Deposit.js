@@ -1,10 +1,12 @@
 import React from 'react'
+import Page from "../Page/Page"
+
 
 function Deposit() {
     return (
-        <div>
+        <Page>
             <h1>Deposit</h1>
-        </div>
+        </Page>
     )
 }
 

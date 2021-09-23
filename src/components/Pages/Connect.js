@@ -1,10 +1,12 @@
 import React from 'react'
+import Page from "../Page/Page"
+
 
 function Connect() {
     return (
-        <div>
+        <Page>
             <h1>Connect</h1>
-        </div>
+        </Page>
     )
 }
 
