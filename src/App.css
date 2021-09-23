@@ -8,9 +8,13 @@ body {
     background-color: black;
 }
 
+root {
+    background-color: black;
+}
+
 .pages {
     color: white;
+    background-color: black;
     text-align: center;
     font-size: 3.5rem;
-    margin-top: 10%;
 }
