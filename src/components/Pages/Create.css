@@ -1,0 +1,27 @@
+.create-container {
+    width: 65%;
+    padding-top: 3%
+}
+
+.double-input-container {
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.small-input-combo-container {
+    width: 45%;
+}
+
+.create-buttons-container {
+    margin-top: 15vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 6vh;
+}
+
+.create-buttons-container>.btn {
+    width: 45%;
+}

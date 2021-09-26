@@ -12,9 +12,6 @@ function Home() {
 
     return (
         <Page>
-            <div className="home-header-container">
-
-            </div>
             <h1 className="home-header">A New Way To Donate</h1>
             <div className="home-details-container">
                 <p className="home-details-paragraph">Deposit Assets.</p>
