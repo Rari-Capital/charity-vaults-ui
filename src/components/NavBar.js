@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import rariLogo from '../images/rari.png'
 import "./NavBar.css"
 
-function NavBar() {
+const NavBar = () => {
     const [isOpen, setOpen] = useState(false);
 
     const handleClick = () => {

@@ -5,7 +5,7 @@ import Button from "../Button/Button"
 import "./Connect.css"
 
 
-function Connect() {
+const Connect = () => {
     return (
         <Page>
             <div className="connect-card-container">

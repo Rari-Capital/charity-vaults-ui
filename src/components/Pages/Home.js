@@ -5,7 +5,7 @@ import Page from "../Page/Page"
 import "./Home.css"
 
 
-function Home() {
+const Home = () => {
     const buttonClick = () => {
         console.log("Clicked!");
     }

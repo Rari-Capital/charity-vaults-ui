@@ -6,7 +6,7 @@ import InputHeader from "../Input/InputHeader"
 import "./Create.css"
 
 
-function Create() {
+const Create = () => {
     return (
         <Page>
             <div className="create-container">

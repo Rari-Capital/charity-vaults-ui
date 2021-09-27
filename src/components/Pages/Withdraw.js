@@ -2,7 +2,7 @@ import React from 'react'
 import Page from "../Page/Page"
 
 
-function Withdraw() {
+const Withdraw = () => {
     return (
         <Page>
             <h1>Withdraw</h1>
