@@ -1,0 +1,27 @@
+.connect-card-container {
+    margin-top: 2%;
+    width: 70%;
+}
+
+.connect-buttons-container {
+    width: 50%;
+    margin-top: 10vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 4vh;
+}
+
+.connect-buttons-container>.btn {
+    width: 45%;
+}
+
+@media screen and (max-width: 700px) {
+    .connect-buttons-container {
+        width: 70%;
+    }
+    
+    .connect-card-container {
+        margin-top: 5%;
+    }
+}
