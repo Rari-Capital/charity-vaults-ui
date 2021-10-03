@@ -6,7 +6,7 @@ const Page = (props) => {
         <div className="page-container">
             <div className="page-content">{props.children}</div>
             <div className="rari-link-container">
-                <a className="rari-link" href="https://rari.capital" target="_blank">
+                <a className="rari-link" rel="noreferrer" href="https://rari.capital" target="_blank">
                     Rari Capital Website
                 </a>
             </div>

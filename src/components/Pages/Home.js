@@ -2,6 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import Button from "../Button/Button"
 import Page from "../Page/Page"
+import { useSelector } from "react-redux"
 import "./Home.css"
 
 
@@ -9,6 +10,9 @@ const Home = () => {
     const buttonClick = () => {
         console.log("Clicked!");
     }
+
+    const testToggle = useSelector(state => state.test.testToggle);
+    console.log(testToggle);
 
     return (
         <Page>
