@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Page from "../Page/Page"
 import Button from "../Button/Button"
 import Input from "../Input/Input"
+import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
 import "./Create.css"
 
@@ -10,6 +11,28 @@ const Create = () => {
     const [charityAddress, setCharityAddress] = useState(null);
     const [giftRate, setGiftRate] = useState(null);
     const [charityName, setCharityName] = useState(null);
+
+    const [showReferralModal, setShowReferralModal] = useState(false);
+    const [referralLink, setReferralLink] = useState(null)
+
+    const generateReferralLink = () => {
+        var getUrl = window.location;
+        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/";
+        
+        let referralLink;
+        if (!charityAddress) {
+            referralLink = "Must provide a charity wallet address.";
+        } else if (!giftRate) {
+            referralLink = "Must provide a gift rate.";
+        } else if (!charityName) {
+            referralLink = "Must provide a charity name.";
+        } else {
+            referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${giftRate}&name=${charityName}`;
+        }
+        
+        setReferralLink(referralLink);
+        setShowReferralModal(true);
+    }
 
     return (
         <Page>
@@ -39,10 +62,15 @@ const Create = () => {
                     </div>
                 </div>
                 <div className="create-buttons-container">
-                    <Button isDark={true}>Generate Referral Link</Button>
+                    <Button isDark={true} onClick={generateReferralLink}>Generate Referral Link</Button>
                     <Button>Deploy New Vault</Button>
                 </div>
             </div>
+            <Modal show={showReferralModal} handleClose={() => setShowReferralModal(false)}>
+                <span style={{"font-size": "18px"}}>
+                    {referralLink}
+                </span>
+            </Modal>
         </Page>
     )
 }
