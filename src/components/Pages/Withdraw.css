@@ -1,0 +1,28 @@
+.withdraw-card-container {
+  margin-top: 2%;
+  width: 70%;
+  text-align: left;
+}
+
+.card-container {
+  align-items: left;
+  border: 1px solid white;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.card-name {
+  text-align: left;
+}
+
+@media screen and (max-width: 700px) {
+  .withdraw-buttons-container {
+    width: 70%;
+  }
+
+  .withdraw-card-container {
+    margin-top: 5%;
+  }
+}
