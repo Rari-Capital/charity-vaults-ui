@@ -1,0 +1,9 @@
+.centered-input-container {
+	width: 50%;
+	margin: auto;
+	padding: 10px;
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: row;
+	justify-content: space-between;
+}
