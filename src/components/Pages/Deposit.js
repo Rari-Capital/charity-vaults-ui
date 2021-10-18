@@ -42,6 +42,45 @@ const Deposit = () => {
 		setShowReferralModal(true);
 	}
 
+	let charityFields;
+	if (showCustomFields) {
+		charityFields = <>
+			<InputHeader value="ENTER CUSTOM CHARITY ADDRESS" />
+			<div className="large-input-container">
+				<Input value={charityAddress}
+					onChange={(event) => { setCharityAddress(event.target.value) }}
+					type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+			</div>
+			<InputHeader value="ENTER CUSTOM CHARITY ADDRESS" />
+			<div className="large-input-container">
+				<Input value={charityAddress}
+					onChange={(event) => { setCharityAddress(event.target.value) }}
+					type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+			</div>
+		</>;
+	} else {
+		charityFields = <>
+			<InputHeader value="SELECT CHARITY" />
+			<select id="selectInterest" className="dropdown-container">
+				<option value="-1">N/A</option>
+				<option value="1%">Red Cross</option>
+				<option value="2%">Gates Foundation</option>
+				<option value="3%">PETA</option>
+			</select>
+			<InputHeader value="SELECT INTEREST RATE" />
+			<div>
+				<select id="selectInterest" className="dropdown-container">
+					<option value="-1">N/A</option>
+					<option value="1%">1%</option>
+					<option value="2%">2%</option>
+					<option value="3%">3%</option>
+					<option value="4%">4%</option>
+					<option value="5%">5%</option>
+				</select>
+			</div>
+		</>;
+	}
+
 	return (
 		<Page>
 			<div className="create-container">
@@ -52,60 +91,9 @@ const Deposit = () => {
 						onChange={() => setShowCustomFields(!showCustomFields)} />
 					<span className="toggle-label">Enter Custom Charity Info?</span>
 				</div>
+				{charityFields}
 
 				<div className="double-input-container">
-					<div className="small-input-combo-container">
-						<InputHeader value="SELECT CHARITY" />
-						<select id="selectInterest" className="dropdown-container">
-							<option value="-1">N/A</option>
-							<option value="1%">Red Cross</option>
-							<option value="2%">Gates Foundation</option>
-							<option value="3%">PETA</option>
-						</select>
-					</div>
-					<div className="small-input-combo-container">
-						<InputHeader value="ENTER CUSTOM CHARITY ADDRESS" />
-						<div className="small-input-container">
-							<Input value={charityAddress}
-								onChange={(event) => { setCharityAddress(event.target.value) }}
-								type="text" placeholder="XXXXXXXXXXXXXXXXX" />
-						</div>
-					</div>
-				</div>
-
-				<div className="centered-text">
-					OR
-				</div>
-
-				<div className="double-input-container">
-					<div class="small-input-combo-container">
-						<InputHeader value="SELECT INTEREST RATE" />
-						<div>
-							<select id="selectInterest" className="dropdown-container">
-								<option value="-1">N/A</option>
-								<option value="1%">1%</option>
-								<option value="2%">2%</option>
-								<option value="3%">3%</option>
-								<option value="4%">4%</option>
-								<option value="5%">5%</option>
-							</select>
-						</div>
-					</div>
-					<div className="small-input-combo-container">
-						<InputHeader value="ENTER CUSTOM IINTEREST RATE" />
-						<div className="small-input-container">
-							<Input value={customInterestRate}
-								onChange={(event) => { setCustomInterestRate(event.target.value) }}
-								type="text" placeholder="X.XX%" />
-						</div>
-					</div>
-				</div>
-
-				<div className="centered-text">
-					AND
-				</div>
-
-				<div className="centered-input-container">
 					<div className="small-input-combo-container">
 						<InputHeader value="SELECT CURRENCY" />
 						<div className="small-input-container">
@@ -114,8 +102,6 @@ const Deposit = () => {
 								type="text" placeholder="XXXXXXXXXXXXXXXXX" />
 						</div>
 					</div>
-				</div>
-				<div className="centered-input-container">
 					<div className="small-input-combo-container">
 						<InputHeader value="SELECT DEPOSIT AMOUNT" />
 						<div className="small-input-container">
