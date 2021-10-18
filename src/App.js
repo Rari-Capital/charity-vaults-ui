@@ -1,4 +1,6 @@
 import './App.css';
+import { useState } from 'react';
+import RariContext, { RariContextDefaultValue } from "./Context"
 import NavBar from "./components/NavBar"
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Home from './components/Pages/Home';
@@ -8,21 +10,35 @@ import Withdraw from './components/Pages/Withdraw';
 import Connect from './components/Pages/Connect';
 
 function App() {
+  const [web3provider, setWeb3Provider] = useState(null);
+  const [web3signer, setWeb3Signer] = useState(null);
+
+  // This value should match the default context value so consumer's know what to expect.
+  const value = {
+    ...RariContextDefaultValue,
+    web3provider: web3provider,
+    web3signer: web3signer,
+    setProvider: setWeb3Provider,
+    setSigner: setWeb3Signer,
+  };
+
   return (
     <>
-      <Router>
-        <NavBar />
+      <RariContext.Provider value={value}>
+        <Router>
+          <NavBar />
 
-        <div className="pages">
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route path="/create" component={Create} />
-            <Route path="/deposit" component={Deposit} />
-            <Route path="/withdraw" component={Withdraw} />
-            <Route path="/connect" component={Connect} />
-          </Switch>
-        </div>
-      </Router>
+          <div className="pages">
+            <Switch>
+              <Route exact path="/" component={Home} />
+              <Route path="/create" component={Create} />
+              <Route path="/deposit" component={Deposit} />
+              <Route path="/withdraw" component={Withdraw} />
+              <Route path="/connect" component={Connect} />
+            </Switch>
+          </div>
+        </Router>
+      </RariContext.Provider>
     </>
   );
 }
