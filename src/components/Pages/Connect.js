@@ -12,9 +12,9 @@ import "./Connect.css"
 const Connect = () => {
     // Extracting function to set provider in context
     const context = useContext(RariContext);
-    console.log(context);
     const provider = context.web3provider;
     const setProvider = context.setProvider;
+    const setSigner = context.setSigner;
 
     // Defining provider options to add wallet connect to web3modal
     const providerOptions = {
@@ -38,7 +38,9 @@ const Connect = () => {
     useEffect(async() => {
         if (!provider && web3Modal.cachedProvider) {
             let new_provider = await web3Modal.connect();
-            setProvider(new_provider);
+            const ethersProvider = new ethers.providers.Web3Provider(new_provider);
+            setProvider(ethersProvider);
+            setSigner(ethersProvider.getSigner());
         }
     }, []);
 
@@ -52,14 +54,14 @@ const Connect = () => {
         // Clear web3modal cached provider and set provider state back to null
         await web3Modal.clearCachedProvider();
         setProvider(null);
+        setSigner(null);
     }
 
     const connect = async () => {
-        console.log("hello");
         const new_provider = await web3Modal.connect();
-        console.log("connected");
         const ethersProvider = new ethers.providers.Web3Provider(new_provider);
         setProvider(ethersProvider);
+        setSigner(ethersProvider.getSigner());
     };
 
     // Determining display name for connected provider (if there is one)

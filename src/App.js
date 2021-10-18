@@ -11,12 +11,15 @@ import Connect from './components/Pages/Connect';
 
 function App() {
   const [web3provider, setWeb3Provider] = useState(null);
+  const [web3signer, setWeb3Signer] = useState(null);
 
   // This value should match the default context value so consumer's know what to expect.
   const value = {
     ...RariContextDefaultValue,
     web3provider: web3provider,
+    web3signer: web3signer,
     setProvider: setWeb3Provider,
+    setSigner: setWeb3Signer,
   };
 
   return (
