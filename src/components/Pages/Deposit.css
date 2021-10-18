@@ -27,6 +27,14 @@
 	/* font-size: 300px; */
 }
 
+.dropdown-container-centered {
+	/* min-width: 100%; */
+	width: 8000x;
+    margin: 10px;
+	height: 58px;
+	/* font-size: 300px; */
+}
+
 .inner-text {
 	font-size: 300px;
 }
