@@ -1,0 +1,34 @@
+.centered-input-container {
+	width: 50%;
+	margin: auto;
+	padding: 10px;
+    margin-top: 1vh;
+    display: flex;
+    flex-direction: row;
+	justify-content: space-between;
+}
+
+.dropdown-container {
+	min-width: 100%;
+	/* width: 400x; */
+    margin: 10px;
+	height: 58px;
+	/* font-size: 300px; */
+}
+
+.dropdown-container-centered {
+	/* min-width: 100%; */
+	width: 8000x;
+    margin: 10px;
+	height: 58px;
+	/* font-size: 300px; */
+}
+
+.inner-text {
+	font-size: 300px;
+}
+
+.centered-text {
+	font-size: 30px;
+	/* text-align: center; */
+}
