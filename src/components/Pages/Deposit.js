@@ -13,7 +13,7 @@ const Deposit = () => {
 
 	const [charityAddress, setCharityAddress] = useState(null);
 	const [customInterestRate, setCustomInterestRate] = useState(null);
-	const [currency, setCurrecncy] = useState(null);
+	const [currency, setCurrency] = useState(null);
 	const [depositAmount, setDepositAmount] = useState(null);
 
 	const [showReferralModal, setShowReferralModal] = useState(false);
@@ -51,11 +51,11 @@ const Deposit = () => {
 					onChange={(event) => { setCharityAddress(event.target.value) }}
 					type="text" placeholder="XXXXXXXXXXXXXXXXX" />
 			</div>
-			<InputHeader value="ENTER CUSTOM CHARITY ADDRESS" />
+			<InputHeader value="ENTER CUSTOM GIFT RATE" />
 			<div className="large-input-container">
-				<Input value={charityAddress}
-					onChange={(event) => { setCharityAddress(event.target.value) }}
-					type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+				<Input value={customInterestRate}
+					onChange={(event) => { setCustomInterestRate(event.target.value) }}
+					type="number" placeholder="XX%" />
 			</div>
 		</>;
 	} else {
@@ -63,19 +63,19 @@ const Deposit = () => {
 			<InputHeader value="SELECT CHARITY" />
 			<select id="selectInterest" className="dropdown-container">
 				<option value="-1">N/A</option>
-				<option value="1%">Red Cross</option>
-				<option value="2%">Gates Foundation</option>
-				<option value="3%">PETA</option>
+				<option value="1%">Charity 1</option>
+				<option value="2%">Charity 2</option>
+				<option value="3%">Charity 3</option>
 			</select>
-			<InputHeader value="SELECT INTEREST RATE" />
+			<InputHeader value="SELECT GIFT RATE" />
 			<div>
 				<select id="selectInterest" className="dropdown-container">
 					<option value="-1">N/A</option>
-					<option value="1%">1%</option>
-					<option value="2%">2%</option>
-					<option value="3%">3%</option>
-					<option value="4%">4%</option>
-					<option value="5%">5%</option>
+					<option value="5">5%</option>
+					<option value="10">10%</option>
+					<option value="15">15%</option>
+					<option value="20">20%</option>
+					<option value="25">25%</option>
 				</select>
 			</div>
 		</>;
@@ -83,7 +83,7 @@ const Deposit = () => {
 
 	return (
 		<Page>
-			<div className="create-container">
+			<div className="deposit-container">
 				<div className="toggle-container">
 					<Toggle
 						defaultChecked={showCustomFields}
@@ -91,19 +91,24 @@ const Deposit = () => {
 						onChange={() => setShowCustomFields(!showCustomFields)} />
 					<span className="toggle-label">Enter Custom Charity Info?</span>
 				</div>
-				{charityFields}
+				<div style={{ "margin-top": "10px" }}>
+					{charityFields}
+				</div>
 
 				<div className="double-input-container">
 					<div className="small-input-combo-container">
 						<InputHeader value="SELECT CURRENCY" />
 						<div className="small-input-container">
-							<Input value={currency}
-								onChange={(event) => { setCurrecncy(event.target.value) }}
-								type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+							<select id="selectInterest" className="dropdown-container">
+								<option value="-1">N/A</option>
+								<option value="BTC">Bitcoin</option>
+								<option value="ETH">Ethereum</option>
+								<option value="USDT">USD Token</option>
+							</select>
 						</div>
 					</div>
 					<div className="small-input-combo-container">
-						<InputHeader value="SELECT DEPOSIT AMOUNT" />
+						<InputHeader value="ENTER DEPOSIT AMOUNT" />
 						<div className="small-input-container">
 							<Input value={depositAmount}
 								onChange={(event) => { setDepositAmount(event.target.value) }}
