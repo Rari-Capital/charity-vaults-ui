@@ -24,3 +24,15 @@
 	font-size: 30px;
 	/* text-align: center; */
 }
+
+.toggle-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.toggle-label {
+	font-size: 15px;
+	margin-left: 10px;
+}
