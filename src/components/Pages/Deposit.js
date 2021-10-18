@@ -98,9 +98,15 @@ import "./Deposit.css"
 					<div className="small-input-combo-container">
 						<InputHeader value="SELECT CURRENCY" />
 						<div className="small-input-container">
-							<Input value={currency} 
+							{/* <Input value={currency} 
 							onChange={(event) => {setCurrecncy(event.target.value)}} 
-							type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+							type="text" placeholder="XXXXXXXXXXXXXXXXX" /> */}
+							<select id="selectInterest" className="dropdown-container">
+								<option value="-1">SELECT AN OPTION</option>
+								<option value="1%">ETHERIUM</option>
+								<option value="2%">BITCOIN</option>
+								<option value="3%">CARDANO</option>
+							</select>
 						</div>
 					</div>
 				</div>
