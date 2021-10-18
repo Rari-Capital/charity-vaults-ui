@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
+import { ethers } from 'ethers';
+import RariContext from '../../Context';
 import Page from "../Page/Page"
 import Card from "../Card/Card"
 import Button from "../Button/Button"
@@ -8,8 +10,11 @@ import "./Connect.css"
 
 
 const Connect = () => {
-    // Storing provider state to be able to display info on page.
-    const [provider, setProvider] = useState(null);
+    // Extracting function to set provider in context
+    const context = useContext(RariContext);
+    console.log(context);
+    const provider = context.web3provider;
+    const setProvider = context.setProvider;
 
     // Defining provider options to add wallet connect to web3modal
     const providerOptions = {
@@ -50,8 +55,11 @@ const Connect = () => {
     }
 
     const connect = async () => {
+        console.log("hello");
         const new_provider = await web3Modal.connect();
-        setProvider(new_provider);
+        console.log("connected");
+        const ethersProvider = new ethers.providers.Web3Provider(new_provider);
+        setProvider(ethersProvider);
     };
 
     // Determining display name for connected provider (if there is one)
@@ -67,7 +75,7 @@ const Connect = () => {
     return (
         <Page>
             <div className="connect-card-container">
-                <Card name="Connected Address" value={provider ? provider.selectedAddress : "XXXXXXXXXXXXXXXXXXXXX"} />
+                <Card name="Connected Address" value={provider ? provider.provider.selectedAddress : "XXXXXXXXXXXXXXXXXXXXX"} />
             </div>
             <div className="connect-card-container">
                 <Card name="Wallet Provider" value={connectedProviderName} />
