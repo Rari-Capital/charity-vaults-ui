@@ -4,6 +4,7 @@ import Button from "../Button/Button"
 import Input from "../Input/Input"
 import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
+import "./Deposit.css"
 
 	const Deposit = () => {
 		const [charityAddress, setCharityAddress] = useState(null);
@@ -42,9 +43,9 @@ import InputHeader from "../Input/InputHeader"
             <div className="create-container">
                 
 				<div className="double-input-container">
-					<div class="small-input-combo-container">
+					<div className="small-input-combo-container">
 					<InputHeader value="SELECT CHARITY" />
-						<select id="selectInterest">
+						<select id="selectInterest" className="dropdown-container">
 							<option value="-1">N/A</option>
 							<option value="1%">Red Cross</option>
 							<option value="2%">Gates Foundation</option>
@@ -61,19 +62,23 @@ import InputHeader from "../Input/InputHeader"
 					</div>
 				</div>
 
-				<br></br>
+				<div className="centered-text">
+					OR
+				</div>
 
 				<div className="double-input-container">
 					<div class="small-input-combo-container">
 					<InputHeader value="SELECT INTEREST RATE" />
-						<select id="selectInterest">
-							<option value="-1">N/A</option>
-							<option value="1%">1%</option>
-							<option value="2%">2%</option>
-							<option value="3%">3%</option>
-							<option value="4%">4%</option>
-							<option value="5%">5%</option>
-						</select>
+						<div>
+							<select id="selectInterest" className="dropdown-container">
+								<option value="-1">N/A</option>
+								<option value="1%">1%</option>
+								<option value="2%">2%</option>
+								<option value="3%">3%</option>
+								<option value="4%">4%</option>
+								<option value="5%">5%</option>
+							</select>
+						</div>
 					</div>
 					<div className="small-input-combo-container">
 						<InputHeader value="ENTER CUSTOM IINTEREST RATE" />
@@ -85,6 +90,9 @@ import InputHeader from "../Input/InputHeader"
 					</div>
 				</div>
 				
+				<div className="centered-text">
+					AND
+				</div>
 
 				<div className="centered-input-container">
 					<div className="small-input-combo-container">
@@ -95,6 +103,8 @@ import InputHeader from "../Input/InputHeader"
 							type="text" placeholder="XXXXXXXXXXXXXXXXX" />
 						</div>
 					</div>
+				</div>
+				<div className="centered-input-container">
 					<div className="small-input-combo-container">
 					<InputHeader value="SELECT DEPOSIT AMOUNT" />
 						<div className="small-input-container">
