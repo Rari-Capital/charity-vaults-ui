@@ -5,8 +5,29 @@ import Input from "../Input/Input"
 import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
 import Toggle from "react-toggle";
+import { useLocation } from "react-router-dom";
 import "react-toggle/style.css"
 import "./Deposit.css"
+
+const charityOptions = {
+	"Charity 1": "Charity 1",
+	"Charity 2": "Charity 2",
+	"Charity 3": "Charity 3"
+}
+
+const interestRateOptions = {
+	"5": "5%",
+	"10": "10%",
+	"15": "15%",
+	"20": "20%",
+	"25": "25%"
+}
+
+const currencyOptions = {
+	"BTC": "Bitcoin",
+	"ETH": "Ethereum",
+	"USDT": "USD Token",
+}
 
 const Deposit = () => {
 	const [showCustomFields, setShowCustomFields] = useState(false);
@@ -29,7 +50,7 @@ const Deposit = () => {
 	const doDeposit = () => {
 		let depositMessage;
 		let errorOccurred = false
-		if (showCustomFields){
+		if (showCustomFields) {
 			if (!charityAddress) {
 				depositMessage = "Must provide a charity wallet address.";
 				errorOccurred = true;
@@ -38,10 +59,10 @@ const Deposit = () => {
 				errorOccurred = true;
 			}
 		} else {
-			if (!charityName || charityName === "invalid"){
+			if (!charityName || charityName === "invalid") {
 				depositMessage = "Must select a charity.";
 				errorOccurred = true;
-			} else if (!interestRate || interestRate === "invalid"){
+			} else if (!interestRate || interestRate === "invalid") {
 				depositMessage = "Must select a gift rate.";
 				errorOccurred = true;
 			}
@@ -57,7 +78,7 @@ const Deposit = () => {
 			}
 		}
 
-		if(!errorOccurred) {
+		if (!errorOccurred) {
 			// Do deposit stuff here eventually
 			depositMessage = `Successful deposit!`
 		}
@@ -75,7 +96,15 @@ const Deposit = () => {
 		setDepositAmount("");
 	}
 
-	
+	// useEffect(() => {
+	// 	const search = useLocation().search;
+	// 	const address = new URLSearchParams(search).get('address');
+	// 	const rate = new URLSearchParams(search).get('rate');
+	// 	const name = new URLSearchParams(search).get('name');
+	// 	if (address) {
+
+	// 	}
+	// }, []);
 
 	let charityFields;
 	if (showCustomFields) {
@@ -85,7 +114,7 @@ const Deposit = () => {
 				<Input value={charityAddress}
 					onChange={(event) => { setCharityAddress(event.target.value) }}
 					type="text" placeholder="XXXXXXXXXXXXXXXXX" />
-				
+
 			</div>
 			<InputHeader value="ENTER CUSTOM GIFT RATE (%)" />
 			<div className="large-input-container">
@@ -97,25 +126,23 @@ const Deposit = () => {
 	} else {
 		charityFields = <>
 			<InputHeader value="SELECT CHARITY" />
-			<select id="selectCharity" value={charityName} 
-			onChange={(event) => setCharityName(event.target.value)} 
-			className="dropdown-container">
+			<select id="selectCharity" value={charityName}
+				onChange={(event) => setCharityName(event.target.value)}
+				className="dropdown-container">
 				<option value="invalid">N/A</option>
-				<option value="Charity 1">Charity 1</option>
-				<option value="Charity 2">Charity 2</option>
-				<option value="Charity 3">Charity 3</option>
+				{Object.keys(charityOptions).map(key => (
+					<option value={key}>{charityOptions[key]}</option>
+				))}
 			</select>
 			<InputHeader value="SELECT GIFT RATE" />
 			<div>
 				<select id="selectInterest" value={interestRate}
-				onChange={(event) => setInterestRate(event.target.value)} 
-				className="dropdown-container">
+					onChange={(event) => setInterestRate(event.target.value)}
+					className="dropdown-container">
 					<option value="invalid">N/A</option>
-					<option value="5">5%</option>
-					<option value="10">10%</option>
-					<option value="15">15%</option>
-					<option value="20">20%</option>
-					<option value="25">25%</option>
+					{Object.keys(interestRateOptions).map(key => (
+						<option value={key}>{interestRateOptions[key]}</option>
+					))}
 				</select>
 			</div>
 		</>;
@@ -140,12 +167,12 @@ const Deposit = () => {
 						<InputHeader value="SELECT CURRENCY" />
 						<div className="small-input-container">
 							<select id="selectCurrency" value={currency}
-							onChange={(event) => setCurrency(event.target.value)} 
-							className="dropdown-container">
+								onChange={(event) => setCurrency(event.target.value)}
+								className="dropdown-container">
 								<option value="invalid">N/A</option>
-								<option value="BTC">Bitcoin</option>
-								<option value="ETH">Ethereum</option>
-								<option value="USDT">USD Token</option>
+								{Object.keys(currencyOptions).map(key => (
+									<option value={key}>{currencyOptions[key]}</option>
+								))}
 							</select>
 						</div>
 					</div>
