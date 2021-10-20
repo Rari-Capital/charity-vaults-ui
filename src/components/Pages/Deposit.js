@@ -9,64 +9,70 @@ import "react-toggle/style.css"
 import "./Deposit.css"
 
 const Deposit = () => {
-	// this.handleChange = this.handleChange.bind(this);
-
 	const [showCustomFields, setShowCustomFields] = useState(false);
 
+	// Pre-select fields
+	const [charityName, setCharityName] = useState("invalid");
+	const [interestRate, setInterestRate] = useState("invalid");
+
+	// Custom fields
 	const [charityAddress, setCharityAddress] = useState(null);
 	const [customInterestRate, setCustomInterestRate] = useState(null);
-	//const [currency, setCurrency] = useState(null);
+
+	// These fields always
+	const [currency, setCurrency] = useState("invalid");
 	const [depositAmount, setDepositAmount] = useState(null);
 
-	const [showReferralModal, setShowReferralModal] = useState(false);
-	const [referralLink, setReferralLink] = useState(null)
+	const [showDepositModal, setShowDepositModal] = useState(false);
+	const [depositModalMessage, setDepositModalMessage] = useState(null)
 
 	const doDeposit = () => {
-		var getUrl = window.location;
-		var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
-		var currency = document.getElementById("selectCurrency").value;
-
-		let referralLink;
+		let depositMessage;
+		let errorOccurred = false
 		if (showCustomFields){
-			console.log(charityAddress);
-			console.log(customInterestRate);
-			console.log(currency);
-			console.log(depositAmount);
 			if (!charityAddress) {
-				referralLink = "Must provide a charity wallet address.";
+				depositMessage = "Must provide a charity wallet address.";
+				errorOccurred = true;
 			} else if (!customInterestRate || customInterestRate <= 0 || customInterestRate >= 100) {
-				referralLink = "Must provide a gift rate/Invalid gift rate.";
-			} else if (!currency || currency == -1) {
-				referralLink = "Must select a currency.";
-			} else if (!depositAmount || depositAmount <= 0) {
-				referralLink = "Must provide valid deposit amount.";
-			} else {
-				//referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${customInterestRate}&name=${currency}&depositAmount=${depositAmount}`;
-				referralLink = `Successful deposit!`
+				depositMessage = "Must provide a valid gift rate.";
+				errorOccurred = true;
 			}
 		} else {
-			var charity = document.getElementById("selectCharity").value;
-			var interest = document.getElementById("selectInterest").value;
-			console.log(charity);
-			console.log(interest);
-			console.log(currency);
-			console.log(depositAmount);
-			if (!charity || charity == -1){
-				referralLink = "Must select a charity.";
-			} else if (!interest || interest == -1){
-				referralLink = "Must select a gift rate.";
-			} else if (!currency || currency == -1) {
-				referralLink = "Must select a currency.";
-			} else if (!depositAmount || depositAmount <= 0) {
-				referralLink = "Must provide valid deposit amount.";
-			} else {
-				//referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${customInterestRate}&name=${currency}&depositAmount=${depositAmount}`;
-				referralLink = `Successful deposit!`
+			if (!charityName || charityName === "invalid"){
+				depositMessage = "Must select a charity.";
+				errorOccurred = true;
+			} else if (!interestRate || interestRate === "invalid"){
+				depositMessage = "Must select a gift rate.";
+				errorOccurred = true;
 			}
 		}
 
-		setReferralLink(referralLink);
-		setShowReferralModal(true);
+		if (!errorOccurred) {
+			if (!currency || currency === "invalid") {
+				errorOccurred = true;
+				depositMessage = "Must select a currency.";
+			} else if (!depositAmount || depositAmount <= 0) {
+				errorOccurred = true;
+				depositMessage = "Must provide valid deposit amount.";
+			}
+		}
+
+		if(!errorOccurred) {
+			// Do deposit stuff here eventually
+			depositMessage = `Successful deposit!`
+		}
+
+		setDepositModalMessage(depositMessage);
+		setShowDepositModal(true);
+	}
+
+	const doReset = () => {
+		setCharityName("invalid");
+		setCharityAddress("");
+		setCustomInterestRate("");
+		setInterestRate("invalid");
+		setCurrency("invalid");
+		setDepositAmount("");
 	}
 
 	
@@ -91,16 +97,20 @@ const Deposit = () => {
 	} else {
 		charityFields = <>
 			<InputHeader value="SELECT CHARITY" />
-			<select id="selectCharity" className="dropdown-container">
-				<option value="-1">N/A</option>
-				<option value="Charity1">Charity 1</option>
-				<option value="Charity2">Charity 2</option>
-				<option value="Charity3">Charity 3</option>
+			<select id="selectCharity" value={charityName} 
+			onChange={(event) => setCharityName(event.target.value)} 
+			className="dropdown-container">
+				<option value="invalid">N/A</option>
+				<option value="Charity 1">Charity 1</option>
+				<option value="Charity 2">Charity 2</option>
+				<option value="Charity 3">Charity 3</option>
 			</select>
 			<InputHeader value="SELECT GIFT RATE" />
 			<div>
-				<select id="selectInterest" className="dropdown-container">
-					<option value="-1">N/A</option>
+				<select id="selectInterest" value={interestRate}
+				onChange={(event) => setInterestRate(event.target.value)} 
+				className="dropdown-container">
+					<option value="invalid">N/A</option>
 					<option value="5">5%</option>
 					<option value="10">10%</option>
 					<option value="15">15%</option>
@@ -129,8 +139,10 @@ const Deposit = () => {
 					<div className="small-input-combo-container">
 						<InputHeader value="SELECT CURRENCY" />
 						<div className="small-input-container">
-							<select id="selectCurrency" className="dropdown-container">
-								<option value="-1">N/A</option>
+							<select id="selectCurrency" value={currency}
+							onChange={(event) => setCurrency(event.target.value)} 
+							className="dropdown-container">
+								<option value="invalid">N/A</option>
 								<option value="BTC">Bitcoin</option>
 								<option value="ETH">Ethereum</option>
 								<option value="USDT">USD Token</option>
@@ -148,13 +160,13 @@ const Deposit = () => {
 				</div>
 
 				<div className="create-buttons-container">
-					<Button isDark={true} onClick={doDeposit}>Deposit</Button>
-					<Button>Deploy New Vault</Button>
+					<Button isDark={true} onClick={doReset}>Reset</Button>
+					<Button onClick={doDeposit}>Deposit</Button>
 				</div>
 			</div>
-			<Modal show={showReferralModal} handleClose={() => setShowReferralModal(false)}>
+			<Modal show={showDepositModal} handleClose={() => setShowDepositModal(false)}>
 				<span style={{ "font-size": "18px" }}>
-					{referralLink}
+					{depositModalMessage}
 				</span>
 			</Modal>
 		</Page>
