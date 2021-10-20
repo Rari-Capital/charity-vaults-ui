@@ -9,11 +9,13 @@ import "react-toggle/style.css"
 import "./Deposit.css"
 
 const Deposit = () => {
+	// this.handleChange = this.handleChange.bind(this);
+
 	const [showCustomFields, setShowCustomFields] = useState(false);
 
 	const [charityAddress, setCharityAddress] = useState(null);
 	const [customInterestRate, setCustomInterestRate] = useState(null);
-	const [currency, setCurrency] = useState(null);
+	//const [currency, setCurrency] = useState(null);
 	const [depositAmount, setDepositAmount] = useState(null);
 
 	const [showReferralModal, setShowReferralModal] = useState(false);
@@ -22,25 +24,52 @@ const Deposit = () => {
 	const doDeposit = () => {
 		var getUrl = window.location;
 		var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
-		var select = document.getElementById("selectInterest");
-		console.log(select);
+		var currency = document.getElementById("selectCurrency").value;
 
 		let referralLink;
-		if (!charityAddress) {
-			referralLink = "Must provide a charity wallet address.";
-		} else if (!customInterestRate) {
-			referralLink = "Must provide a gift rate.";
-		} else if (!currency) {
-			referralLink = "Must provide a charity name.";
-		} else if (!depositAmount) {
-			referralLink = "Must provide deposit amount.";
+		if (showCustomFields){
+			console.log(charityAddress);
+			console.log(customInterestRate);
+			console.log(currency);
+			console.log(depositAmount);
+			if (!charityAddress) {
+				referralLink = "Must provide a charity wallet address.";
+			} else if (!customInterestRate || customInterestRate <= 0 || customInterestRate >= 100) {
+				referralLink = "Must provide a gift rate/Invalid gift rate.";
+			} else if (!currency || currency == -1) {
+				referralLink = "Must select a currency.";
+			} else if (!depositAmount || depositAmount <= 0) {
+				referralLink = "Must provide valid deposit amount.";
+			} else {
+				//referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${customInterestRate}&name=${currency}&depositAmount=${depositAmount}`;
+				referralLink = `Successful deposit!`
+			}
 		} else {
-			referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${customInterestRate}&name=${currency}&depositAmount=${depositAmount}`;
+			var charity = document.getElementById("selectCharity").value;
+			var interest = document.getElementById("selectInterest").value;
+			console.log(charity);
+			console.log(interest);
+			console.log(currency);
+			console.log(depositAmount);
+			if (!charity || charity == -1){
+				referralLink = "Must select a charity.";
+			} else if (!interest || interest == -1){
+				referralLink = "Must select a gift rate.";
+			} else if (!currency || currency == -1) {
+				referralLink = "Must select a currency.";
+			} else if (!depositAmount || depositAmount <= 0) {
+				referralLink = "Must provide valid deposit amount.";
+			} else {
+				//referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${customInterestRate}&name=${currency}&depositAmount=${depositAmount}`;
+				referralLink = `Successful deposit!`
+			}
 		}
 
 		setReferralLink(referralLink);
 		setShowReferralModal(true);
 	}
+
+	
 
 	let charityFields;
 	if (showCustomFields) {
@@ -50,8 +79,9 @@ const Deposit = () => {
 				<Input value={charityAddress}
 					onChange={(event) => { setCharityAddress(event.target.value) }}
 					type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+				
 			</div>
-			<InputHeader value="ENTER CUSTOM GIFT RATE" />
+			<InputHeader value="ENTER CUSTOM GIFT RATE (%)" />
 			<div className="large-input-container">
 				<Input value={customInterestRate}
 					onChange={(event) => { setCustomInterestRate(event.target.value) }}
@@ -61,11 +91,11 @@ const Deposit = () => {
 	} else {
 		charityFields = <>
 			<InputHeader value="SELECT CHARITY" />
-			<select id="selectInterest" className="dropdown-container">
+			<select id="selectCharity" className="dropdown-container">
 				<option value="-1">N/A</option>
-				<option value="1%">Charity 1</option>
-				<option value="2%">Charity 2</option>
-				<option value="3%">Charity 3</option>
+				<option value="Charity1">Charity 1</option>
+				<option value="Charity2">Charity 2</option>
+				<option value="Charity3">Charity 3</option>
 			</select>
 			<InputHeader value="SELECT GIFT RATE" />
 			<div>
@@ -99,7 +129,7 @@ const Deposit = () => {
 					<div className="small-input-combo-container">
 						<InputHeader value="SELECT CURRENCY" />
 						<div className="small-input-container">
-							<select id="selectInterest" className="dropdown-container">
+							<select id="selectCurrency" className="dropdown-container">
 								<option value="-1">N/A</option>
 								<option value="BTC">Bitcoin</option>
 								<option value="ETH">Ethereum</option>
