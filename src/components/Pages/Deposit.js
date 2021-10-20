@@ -12,15 +12,15 @@ const Deposit = () => {
 	const [showCustomFields, setShowCustomFields] = useState(false);
 
 	// Pre-select fields
-	const [charityName, setCharityName] = useState(null);
-	const [interestRate, setInterestRate] = useState(null);
+	const [charityName, setCharityName] = useState("invalid");
+	const [interestRate, setInterestRate] = useState("invalid");
 
 	// Custom fields
 	const [charityAddress, setCharityAddress] = useState(null);
 	const [customInterestRate, setCustomInterestRate] = useState(null);
 
 	// These fields always
-	const [currency, setCurrency] = useState(null);
+	const [currency, setCurrency] = useState("invalid");
 	const [depositAmount, setDepositAmount] = useState(null);
 
 	const [showDepositModal, setShowDepositModal] = useState(false);
@@ -38,17 +38,17 @@ const Deposit = () => {
 				errorOccurred = true;
 			}
 		} else {
-			if (!charityName || charityName === -1){
+			if (!charityName || charityName === "invalid"){
 				depositMessage = "Must select a charity.";
 				errorOccurred = true;
-			} else if (!interestRate || interestRate === "-1"){
+			} else if (!interestRate || interestRate === "invalid"){
 				depositMessage = "Must select a gift rate.";
 				errorOccurred = true;
 			}
 		}
 
 		if (!errorOccurred) {
-			if (!currency || currency === "-1") {
+			if (!currency || currency === "invalid") {
 				errorOccurred = true;
 				depositMessage = "Must select a currency.";
 			} else if (!depositAmount || depositAmount <= 0) {
@@ -64,6 +64,15 @@ const Deposit = () => {
 
 		setDepositModalMessage(depositMessage);
 		setShowDepositModal(true);
+	}
+
+	const doReset = () => {
+		setCharityName("invalid");
+		setCharityAddress("");
+		setCustomInterestRate("");
+		setInterestRate("invalid");
+		setCurrency("invalid");
+		setDepositAmount("");
 	}
 
 	
@@ -91,7 +100,7 @@ const Deposit = () => {
 			<select id="selectCharity" value={charityName} 
 			onChange={(event) => setCharityName(event.target.value)} 
 			className="dropdown-container">
-				<option value="-1">N/A</option>
+				<option value="invalid">N/A</option>
 				<option value="Charity 1">Charity 1</option>
 				<option value="Charity 2">Charity 2</option>
 				<option value="Charity 3">Charity 3</option>
@@ -101,7 +110,7 @@ const Deposit = () => {
 				<select id="selectInterest" value={interestRate}
 				onChange={(event) => setInterestRate(event.target.value)} 
 				className="dropdown-container">
-					<option value="-1">N/A</option>
+					<option value="invalid">N/A</option>
 					<option value="5">5%</option>
 					<option value="10">10%</option>
 					<option value="15">15%</option>
@@ -133,7 +142,7 @@ const Deposit = () => {
 							<select id="selectCurrency" value={currency}
 							onChange={(event) => setCurrency(event.target.value)} 
 							className="dropdown-container">
-								<option value="-1">N/A</option>
+								<option value="invalid">N/A</option>
 								<option value="BTC">Bitcoin</option>
 								<option value="ETH">Ethereum</option>
 								<option value="USDT">USD Token</option>
@@ -151,7 +160,7 @@ const Deposit = () => {
 				</div>
 
 				<div className="create-buttons-container">
-					<Button isDark={true}>Reset</Button>
+					<Button isDark={true} onClick={doReset}>Reset</Button>
 					<Button onClick={doDeposit}>Deposit</Button>
 				</div>
 			</div>
