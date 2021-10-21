@@ -20,7 +20,7 @@ const NavBar = () => {
         <nav className="navbar" >
             <div className="nav-container" >
                     <NavLink exact to="/" className="nav-logo" >
-                        <img src={rariLogo} className="rari-logo" />
+                        <img src={rariLogo} alt="rari-logo" className="rari-logo" />
                     Charity Vaults
         </NavLink>
 
