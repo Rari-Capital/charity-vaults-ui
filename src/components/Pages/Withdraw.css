@@ -61,3 +61,8 @@ table th {
 .withdraw-buttons-container>.btn {
     width: 45%;
 }
+
+#selected-row {
+    background-color: white;
+    color: black;
+}

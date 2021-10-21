@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import Button from "../Button/Button"
 import Page from "../Page/Page"
 import { useTable } from 'react-table';
@@ -55,6 +55,13 @@ const Withdraw = () => {
     const columns = useMemo(() => withdrawColumns, []);
     const data = useMemo(() => currentDeposits, []);
 
+    const [selectedRowInfo, setSelectedRowInfo] = useState(null);
+    let selectedRowVaultName;
+    if (selectedRowInfo) {
+        selectedRowVaultName = selectedRowInfo.charity_name;
+    }
+    console.log(selectedRowInfo);
+
 
     const withdrawTableInstance = useTable({
         columns: columns,
@@ -88,9 +95,10 @@ const Withdraw = () => {
                             {rows.map(row => {
                                 prepareRow(row)
                                 return (
-                                    <tr {...row.getRowProps()}>
+                                    <tr {...row.getRowProps()} id={row.original.charity_name === selectedRowVaultName ? "selected-row" : ""}
+                                        onClick={() => setSelectedRowInfo(row.original)}>
                                         {row.cells.map((cell) => {
-                                            return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                                            return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                                         })}
                                     </tr>
                                 )
@@ -99,7 +107,7 @@ const Withdraw = () => {
                     </table>
                 </div>
                 <div className="withdraw-buttons-container">
-                    <Button isDark={true}>Deselect</Button>
+                    <Button isDark={true} onClick={() => setSelectedRowInfo(null)}>Deselect</Button>
                     <Button>Withdraw</Button>
                 </div>
             </div>
