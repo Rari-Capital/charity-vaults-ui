@@ -1,5 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import Button from "../Button/Button"
+import Modal from "../Modal/Modal"
+import InputHeader from "../Input/InputHeader"
+import Input from "../Input/Input"
 import Page from "../Page/Page"
 import { useTable } from 'react-table';
 import "./Withdraw.css"
@@ -60,8 +63,15 @@ const Withdraw = () => {
     if (selectedRowInfo) {
         selectedRowVaultName = selectedRowInfo.charity_name;
     }
-    console.log(selectedRowInfo);
 
+    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+    const [withdrawModalContent, setWithdrawModalContent] = useState(null);
+
+    // To display error messages
+    const [showWithdrawErrorModal, setShowWithdrawErrorModal] = useState(false);
+    const [withdrawErrorModalContent, setWithdrawErrorModalContent] = useState(null);
+
+    const [amountToWithdraw, setAmountToWithdraw] = useState(null);
 
     const withdrawTableInstance = useTable({
         columns: columns,
@@ -69,6 +79,35 @@ const Withdraw = () => {
     });
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = withdrawTableInstance;
+
+    const initiateWithdraw = () => {
+        let withdrawModalContent;
+        if (!selectedRowInfo) {
+            withdrawModalContent = <span style={{ "font-size": "18px" }}>
+                Must select a deposit to withdraw!
+            </span>;
+            setWithdrawErrorModalContent(withdrawModalContent);
+            setShowWithdrawErrorModal(true);
+        } else {
+            withdrawModalContent = <div>
+                <h2 className="modal-header">{selectedRowInfo.charity_name}</h2>
+                <div>
+                    <span className="modal-span"><strong>Gift Rate:</strong> {selectedRowInfo.rate}%</span>
+                </div>
+                <div>
+                    <span className="modal-span"><strong>Amount Deposited:</strong> {selectedRowInfo.amount} {selectedRowInfo.token}</span>
+                </div>
+                <InputHeader value="INTEREST GIFT RATE" />
+                <div className="small-input-container">
+                    <Input value={amountToWithdraw}
+                        onChange={(event) => { setAmountToWithdraw(event.target.value) }}
+                        type="number" placeholder="XXXXXXXXXXXXXXXXX" />
+                </div>
+            </div>;
+            setWithdrawModalContent(withdrawModalContent);
+            setShowWithdrawModal(true);
+        }
+    }
 
     return (
         <Page>
@@ -108,9 +147,15 @@ const Withdraw = () => {
                 </div>
                 <div className="withdraw-buttons-container">
                     <Button isDark={true} onClick={() => setSelectedRowInfo(null)}>Deselect</Button>
-                    <Button>Withdraw</Button>
+                    <Button onClick={() => initiateWithdraw()}>Withdraw</Button>
                 </div>
             </div>
+            <Modal show={showWithdrawModal} buttonText="Confirm Withdrawal" handleClose={() => setShowWithdrawModal(false)}>
+                {withdrawModalContent}
+            </Modal>
+            <Modal show={showWithdrawErrorModal} handleClose={() => setShowWithdrawErrorModal(false)}>
+                {withdrawErrorModalContent}
+            </Modal>
         </Page>
     )
 }

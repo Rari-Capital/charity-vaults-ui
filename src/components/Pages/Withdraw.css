@@ -66,3 +66,11 @@ table th {
     background-color: white;
     color: black;
 }
+
+.modal-header {
+    font-size: 48px;
+}
+
+.modal-span {
+    font-size: 24px;
+}
