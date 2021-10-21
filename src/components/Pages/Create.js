@@ -29,6 +29,8 @@ const Create = () => {
         } else {
             referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${giftRate}&name=${charityName}`;
         }
+
+        referralLink = referralLink.replace(' ', '-');
         
         setReferralLink(referralLink);
         setShowReferralModal(true);
