@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import RariContext, { RariContextDefaultValue } from "./Context"
 import NavBar from "./components/NavBar"
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
@@ -7,11 +7,17 @@ import Home from './components/Pages/Home';
 import Create from './components/Pages/Create';
 import Deposit from './components/Pages/Deposit';
 import Withdraw from './components/Pages/Withdraw';
-import Connect from './components/Pages/Connect';
+import Connect, { connectCachedProvider } from './components/Pages/Connect';
+
 
 function App() {
   const [web3provider, setWeb3Provider] = useState(null);
   const [web3signer, setWeb3Signer] = useState(null);
+
+  // Connect to cached provider if any.
+  useEffect(() => {
+    connectCachedProvider(web3provider, setWeb3Provider, setWeb3Signer);
+  }, []);
 
   // This value should match the default context value so consumer's know what to expect.
   const value = {

@@ -17,7 +17,7 @@ const Create = () => {
 
     const generateReferralLink = () => {
         var getUrl = window.location;
-        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/";
+        var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
         
         let referralLink;
         if (!charityAddress) {
