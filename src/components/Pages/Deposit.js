@@ -30,7 +30,10 @@ const currencyOptions = {
 }
 
 const Deposit = () => {
+	const search = useLocation().search;
+
 	const [showCustomFields, setShowCustomFields] = useState(false);
+	const [referralParamsHandled, setReferralParamsHandled] = useState(false);
 
 	// Pre-select fields
 	const [charityName, setCharityName] = useState("invalid");
@@ -96,15 +99,45 @@ const Deposit = () => {
 		setDepositAmount("");
 	}
 
-	// useEffect(() => {
-	// 	const search = useLocation().search;
-	// 	const address = new URLSearchParams(search).get('address');
-	// 	const rate = new URLSearchParams(search).get('rate');
-	// 	const name = new URLSearchParams(search).get('name');
-	// 	if (address) {
+	const handleReferralParams = () => {
+		const address = new URLSearchParams(search).get('address');
+		const rate = new URLSearchParams(search).get('rate');
+		let name = new URLSearchParams(search).get('name');
+		if(!name || !rate || !address) {
+			return;
+		}
+		name = name.replace("-", " ");
+		let foundName = false;
+		if (name) {
+			for (const [key, value] of Object.entries(charityOptions)) {
+				if(key.toLowerCase() === name.toLowerCase()) {
+					setCharityName(key);
+					foundName = true;
+				}
+			}
+		}
+		if (address) {
+			setCharityAddress(address);
+		}
+		for (const [key, value] of Object.entries(interestRateOptions)) {
+			if(key === rate) {
+				setInterestRate(key);
+			}
+		}
+		if(rate) {
+			setCustomInterestRate(rate);
+		}
+		if(foundName) {
+			setShowCustomFields(false);
+		} else {
+			setShowCustomFields(true);
+		}
+		setReferralParamsHandled(true);
+	};
 
-	// 	}
-	// }, []);
+	if (!referralParamsHandled) {
+		handleReferralParams();
+	}
 
 	let charityFields;
 	if (showCustomFields) {
