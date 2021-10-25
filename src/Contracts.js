@@ -1,9 +1,6 @@
 import { ethers } from 'ethers'
-
-const CharityVaultAbiFilePath = 'insert-here';
-
-const CharityVaultFactoryAbiFilePath = 'insert-here';
-const CharityVaultFactoryDeployedAddress = 'insert-here';
+import { CharityVaultAbiFilePath, CharityVaultFactoryAbiFilePath, 
+    CharityVaultFactoryDeployedAddress } from './config.js';
 
 
 export const getCharityVaultContractByAddress = (address, signer) => {
