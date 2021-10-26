@@ -6,7 +6,7 @@ import Card from "../Card/Card"
 import Button from "../Button/Button"
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-/*import { WalletConnectInfuraId, Network } from "./../../config";*/
+import { WalletConnectInfuraId, Network } from "./../../config";
 import "./Connect.css"
 
 
@@ -15,14 +15,14 @@ const providerOptions = {
     walletconnect: {
         package: WalletConnectProvider,
         options: {
-            infuraId: "782109c6748c48d6b91c3eafa72b5292",
+            infuraId: WalletConnectInfuraId,
         }
     },
 };
 
 // Initializing web3modal
 export const web3Modal = new Web3Modal({
-    network: "goerli",
+    network: Network,
     cacheProvider: true, // optional
     disableInjectedProvider: false,
     providerOptions // required
