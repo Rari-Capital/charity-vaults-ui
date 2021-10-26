@@ -48,18 +48,18 @@ const Create = () => {
     }
 
     const deployVault = async () => {
-        const charityVaultFactoryContract = getCharityVaultFactoryContract(signer);
 
-        console.log("Deploy Vault")
-        console.log("Charity Address:", charityAddress);
-        console.log("Gift Rate:", giftRate);
-        console.log("Charity Name:", charityName)
+        if (signer && charityAddress && giftRate && charityName) {
+            const charityVaultFactoryContract = getCharityVaultFactoryContract(signer);
 
-        // let owner = await charityVaultFactoryContract.owner();
-        let charityVault = await charityVaultFactoryContract.deployCharityVault(Tokens[currency], charityAddress, giftRate);
+            console.log("Deploy Vault")
+            console.log("Charity Address:", charityAddress);
+            console.log("Gift Rate:", giftRate);
+            console.log("Charity Name:", charityName)
 
-        // console.log(owner);
-        console.log(charityVault);
+            let charityVault = await charityVaultFactoryContract.deployCharityVault(Tokens[currency], charityAddress, giftRate);
+            console.log(charityVault);
+        }
 
     }
 
