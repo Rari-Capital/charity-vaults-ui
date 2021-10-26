@@ -6,6 +6,7 @@ import Input from "../Input/Input"
 import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
 import { ethers } from 'ethers';
+import { Tokens } from './../../config';
 import "./Create.css"
 
 import CharityVaultFactoryABI from '../../contracts/CharityVaultFactory.sol/CharityVaultFactory.json';
@@ -14,6 +15,7 @@ const Create = () => {
     const [charityAddress, setCharityAddress] = useState(null);
     const [giftRate, setGiftRate] = useState(null);
     const [charityName, setCharityName] = useState(null);
+    const [currency, setCurrency] = useState("invalid");
 
     const [showReferralModal, setShowReferralModal] = useState(false);
     const [referralLink, setReferralLink] = useState(null)
@@ -28,7 +30,7 @@ const Create = () => {
     const generateReferralLink = () => {
         var getUrl = window.location;
         var baseUrl = getUrl.protocol + "//" + getUrl.host + "/";
-        
+
         let referralLink;
         if (!charityAddress) {
             referralLink = "Must provide a charity wallet address.";
@@ -36,12 +38,14 @@ const Create = () => {
             referralLink = "Must provide a gift rate.";
         } else if (!charityName) {
             referralLink = "Must provide a charity name.";
+        } else if (!currency || currency == "invalid") {
+            referralLink = "Must select a currency.";
         } else {
-            referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${giftRate}&name=${charityName}`;
+            referralLink = `${baseUrl}deposit?address=${charityAddress}&rate=${giftRate}&name=${charityName}&currency=${currency}`;
         }
 
         referralLink = referralLink.replace(' ', '-');
-        
+
         setReferralLink(referralLink);
         setShowReferralModal(true);
     }
@@ -54,7 +58,7 @@ const Create = () => {
         console.log("Charity Name:", charityName)
 
         // let owner = await charityVaultFactoryContract.owner();
-        let charityVault = await charityVaultFactoryContract.deployCharityVault("0x5ffbac75efc9547fbc822166fed19b05cd5890bb", charityAddress, giftRate);
+        let charityVault = await charityVaultFactoryContract.deployCharityVault(Tokens[currency], charityAddress, giftRate);
 
         // console.log(owner);
         console.log(charityVault);
@@ -66,25 +70,36 @@ const Create = () => {
             <div className="create-container">
                 <InputHeader value="CHARITY WALLET ADDRESS" />
                 <div className="large-input-container">
-                    <Input value={charityAddress} 
-                    onChange={(event) => {setCharityAddress(event.target.value)}} 
-                    type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+                    <Input value={charityAddress}
+                        onChange={(event) => { setCharityAddress(event.target.value) }}
+                        type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+                </div>
+                <InputHeader value="CHARITY NAME" />
+                <div className="large-input-container">
+                    <Input value={charityName}
+                        onChange={(event) => { setCharityName(event.target.value) }}
+                        type="text" placeholder="XXXXXXXXXXXXXXXXX" />
                 </div>
                 <div className="double-input-container">
                     <div className="small-input-combo-container">
                         <InputHeader value="INTEREST GIFT RATE" />
                         <div className="small-input-container">
-                        <Input value={giftRate} 
-                        onChange={(event) => {setGiftRate(event.target.value)}} 
-                        type="number" placeholder="XXXXXXXXXXXXXXXXX" />
+                            <Input value={giftRate}
+                                onChange={(event) => { setGiftRate(event.target.value) }}
+                                type="number" placeholder="XXXXXXXXXXXXXXXXX" />
                         </div>
                     </div>
                     <div className="small-input-combo-container">
-                        <InputHeader value="CHARITY NAME" />
+                        <InputHeader value="SELECT CURRENCY" />
                         <div className="small-input-container">
-                        <Input value={charityName} 
-                        onChange={(event) => {setCharityName(event.target.value)}} 
-                        type="text" placeholder="XXXXXXXXXXXXXXXXX" />
+                            <select id="selectCurrency" value={currency}
+                                onChange={(event) => setCurrency(event.target.value)}
+                                className="dropdown-container">
+                                <option value="invalid">N/A</option>
+                                {Object.keys(Tokens).map(key => (
+                                    <option value={key}>{key}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -94,7 +109,7 @@ const Create = () => {
                 </div>
             </div>
             <Modal show={showReferralModal} handleClose={() => setShowReferralModal(false)}>
-                <span style={{"font-size": "18px"}}>
+                <span style={{ "font-size": "18px" }}>
                     {referralLink}
                 </span>
             </Modal>

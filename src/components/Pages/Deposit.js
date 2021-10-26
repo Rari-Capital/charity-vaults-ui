@@ -6,6 +6,7 @@ import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
 import Toggle from "react-toggle";
 import { useLocation } from "react-router-dom";
+import { Tokens } from '../../config'
 import "react-toggle/style.css"
 import "./Deposit.css"
 
@@ -21,12 +22,6 @@ const interestRateOptions = {
 	"15": "15%",
 	"20": "20%",
 	"25": "25%"
-}
-
-const currencyOptions = {
-	"BTC": "Bitcoin",
-	"ETH": "Ethereum",
-	"USDT": "USD Token",
 }
 
 const Deposit = () => {
@@ -103,7 +98,8 @@ const Deposit = () => {
 		const address = new URLSearchParams(search).get('address');
 		const rate = new URLSearchParams(search).get('rate');
 		let name = new URLSearchParams(search).get('name');
-		if(!name || !rate || !address) {
+		let currency = new URLSearchParams(search).get('currency');
+		if(!name || !rate || !address || !currency) {
 			return;
 		}
 		name = name.replace("-", " ");
@@ -126,6 +122,9 @@ const Deposit = () => {
 		}
 		if(rate) {
 			setCustomInterestRate(rate);
+		}
+		if(currency && currency in Tokens) {
+			setCurrency(currency);
 		}
 		if(foundName) {
 			setShowCustomFields(false);
@@ -203,8 +202,8 @@ const Deposit = () => {
 								onChange={(event) => setCurrency(event.target.value)}
 								className="dropdown-container">
 								<option value="invalid">N/A</option>
-								{Object.keys(currencyOptions).map(key => (
-									<option value={key}>{currencyOptions[key]}</option>
+								{Object.keys(Tokens).map(key => (
+									<option value={key}>{key}</option>
 								))}
 							</select>
 						</div>
