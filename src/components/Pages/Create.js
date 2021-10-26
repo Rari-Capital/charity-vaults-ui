@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import Page from "../Page/Page"
+import RariContext from '../../Context';
 import Button from "../Button/Button"
 import Input from "../Input/Input"
 import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
+import { ethers } from 'ethers';
 import "./Create.css"
 
+import CharityVaultFactoryABI from '../../contracts/CharityVaultFactory.sol/CharityVaultFactory.json';
 
 const Create = () => {
     const [charityAddress, setCharityAddress] = useState(null);
@@ -14,6 +17,13 @@ const Create = () => {
 
     const [showReferralModal, setShowReferralModal] = useState(false);
     const [referralLink, setReferralLink] = useState(null)
+
+    const charityVaultFactoryAddress = '0x293e3a98CC905e759EDB07d579fa2Cdb24941575';
+
+    const context = useContext(RariContext);
+    const provider = context.web3provider;
+    const signer = context.web3signer;
+    const charityVaultFactoryContract = new ethers.Contract(charityVaultFactoryAddress, CharityVaultFactoryABI.abi, signer);
 
     const generateReferralLink = () => {
         var getUrl = window.location;
@@ -34,6 +44,21 @@ const Create = () => {
         
         setReferralLink(referralLink);
         setShowReferralModal(true);
+    }
+
+    const deployVault = async () => {
+
+        console.log("Deploy Vault")
+        console.log("Charity Address:", charityAddress);
+        console.log("Gift Rate:", giftRate);
+        console.log("Charity Name:", charityName)
+
+        // let owner = await charityVaultFactoryContract.owner();
+        let charityVault = await charityVaultFactoryContract.deployCharityVault("0x5ffbac75efc9547fbc822166fed19b05cd5890bb", charityAddress, giftRate);
+
+        // console.log(owner);
+        console.log(charityVault);
+
     }
 
     return (
@@ -65,7 +90,7 @@ const Create = () => {
                 </div>
                 <div className="create-buttons-container">
                     <Button isDark={true} onClick={generateReferralLink}>Generate Referral Link</Button>
-                    <Button>Deploy New Vault</Button>
+                    <Button onClick={deployVault}>Deploy New Vault</Button>
                 </div>
             </div>
             <Modal show={showReferralModal} handleClose={() => setShowReferralModal(false)}>
