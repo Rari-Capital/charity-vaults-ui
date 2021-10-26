@@ -49,18 +49,30 @@ const Create = () => {
 
     const deployVault = async () => {
 
-        if (signer && charityAddress && giftRate && charityName) {
+        let message = "Deploy Vault Successful";
+        if (!charityAddress) {
+            message = "Must provide a charity wallet address.";
+        } else if (!giftRate) {
+            message = "Must provide a gift rate.";
+        } else if (!charityName) {
+            message = "Must provide a charity name.";
+        } else if (!currency || currency == "invalid") {
+            message = "Must select a currency.";
+        } else if (!signer) {
+            message = "Must connect to a wallet.";
+        } else {
             const charityVaultFactoryContract = getCharityVaultFactoryContract(signer);
 
             console.log("Deploy Vault")
             console.log("Charity Address:", charityAddress);
-            console.log("Gift Rate:", giftRate);
             console.log("Charity Name:", charityName)
+            console.log("Gift Rate:", giftRate);
+            console.log("Underlying:", currency);
 
             let charityVault = await charityVaultFactoryContract.deployCharityVault(Tokens[currency], charityAddress, giftRate);
             console.log(charityVault);
         }
-
+        console.log(message);
     }
 
     return (
