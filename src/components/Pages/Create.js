@@ -7,9 +7,9 @@ import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
 import { ethers } from 'ethers';
 import { Tokens } from './../../config';
+import { getCharityVaultFactoryContract } from '../../Contracts';
 import "./Create.css"
 
-import CharityVaultFactoryABI from '../../contracts/CharityVaultFactory.sol/CharityVaultFactory.json';
 
 const Create = () => {
     const [charityAddress, setCharityAddress] = useState(null);
@@ -20,12 +20,9 @@ const Create = () => {
     const [showReferralModal, setShowReferralModal] = useState(false);
     const [referralLink, setReferralLink] = useState(null)
 
-    const charityVaultFactoryAddress = '0x293e3a98CC905e759EDB07d579fa2Cdb24941575';
-
     const context = useContext(RariContext);
     const provider = context.web3provider;
     const signer = context.web3signer;
-    const charityVaultFactoryContract = new ethers.Contract(charityVaultFactoryAddress, CharityVaultFactoryABI.abi, signer);
 
     const generateReferralLink = () => {
         var getUrl = window.location;
@@ -51,6 +48,7 @@ const Create = () => {
     }
 
     const deployVault = async () => {
+        const charityVaultFactoryContract = getCharityVaultFactoryContract(signer);
 
         console.log("Deploy Vault")
         console.log("Charity Address:", charityAddress);

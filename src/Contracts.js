@@ -1,21 +1,16 @@
 import { ethers } from 'ethers'
-import { CharityVaultAbiFilePath, CharityVaultFactoryAbiFilePath, 
+import { CharityVaultABI, CharityVaultFactoryABI, 
     CharityVaultFactoryDeployedAddress } from './config.js';
-
 
 export const getCharityVaultContractByAddress = (address, signer) => {
     // The address passed in here is the address of the underlying charity vault we are fetching.
     // This must be retrieved by first using the factory contract to get the underlying address.
-    abi = JSON.parse(fs.readFileSync(CharityVaultAbiFilePath).toString());
-
-    contract = new ethers.Contract(address, abi, signer)
+    const contract = new ethers.Contract(address, CharityVaultABI.abi, signer)
     return contract;
 }
 
 export const getCharityVaultFactoryContract = (signer) => {
-    abi = JSON.parse(fs.readFileSync(CharityVaultFactoryAbiFilePath).toString());
-
-    contract = new ethers.Contract(CharityVaultFactoryDeployedAddress, abi, signer)
+    const contract = new ethers.Contract(CharityVaultFactoryDeployedAddress, CharityVaultFactoryABI.abi, signer)
     return contract;
 }
 
