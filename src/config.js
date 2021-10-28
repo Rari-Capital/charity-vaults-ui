@@ -1,7 +1,8 @@
-import charitVaultFactoryABI from './contracts/CharityVaultFactory.sol/CharityVaultFactory.json';
+import charityVaultFactoryABI from './contracts/CharityVaultFactory.sol/CharityVaultFactory.json';
+import charityVaultABI from './contracts/CharityVault.sol/CharityVault.json';
 
-export const CharityVaultABI = 'insert-here';
-export const CharityVaultFactoryABI = charitVaultFactoryABI;
+export const CharityVaultABI = charityVaultABI;
+export const CharityVaultFactoryABI = charityVaultFactoryABI;
 
 export const CharityVaultFactoryDeployedAddress = '0x293e3a98CC905e759EDB07d579fa2Cdb24941575';
 

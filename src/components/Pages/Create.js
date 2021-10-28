@@ -5,9 +5,8 @@ import Button from "../Button/Button"
 import Input from "../Input/Input"
 import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
-import { ethers } from 'ethers';
 import { Tokens } from './../../config';
-import { getCharityVaultFactoryContract } from '../../Contracts';
+import { getCharityVaultFactoryContract, getCharityVaultContract } from '../../Contracts';
 import "./Create.css"
 
 
@@ -17,8 +16,8 @@ const Create = () => {
     const [charityName, setCharityName] = useState(null);
     const [currency, setCurrency] = useState("invalid");
 
-    const [showReferralModal, setShowReferralModal] = useState(false);
-    const [referralLink, setReferralLink] = useState(null)
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState(null)
 
     const context = useContext(RariContext);
     const provider = context.web3provider;
@@ -43,8 +42,8 @@ const Create = () => {
 
         referralLink = referralLink.replace(' ', '-');
 
-        setReferralLink(referralLink);
-        setShowReferralModal(true);
+        setModalMessage(referralLink);
+        setShowModal(true);
     }
 
     const deployVault = async () => {
@@ -61,18 +60,18 @@ const Create = () => {
         } else if (!signer) {
             message = "Must connect to a wallet.";
         } else {
-            const charityVaultFactoryContract = getCharityVaultFactoryContract(signer);
+            const existingCharityVault = await getCharityVaultContract(Tokens[currency], charityAddress, giftRate, signer);
 
-            console.log("Deploy Vault")
-            console.log("Charity Address:", charityAddress);
-            console.log("Charity Name:", charityName)
-            console.log("Gift Rate:", giftRate);
-            console.log("Underlying:", currency);
-
-            let charityVault = await charityVaultFactoryContract.deployCharityVault(Tokens[currency], charityAddress, giftRate);
-            console.log(charityVault);
+            if (existingCharityVault) {
+                message = "A charity vault already exists with the provided information."
+            } else {
+                const charityVaultFactoryContract = getCharityVaultFactoryContract(signer);
+                await charityVaultFactoryContract.deployCharityVault(Tokens[currency], charityAddress, giftRate);
+                message = "Successfully deployed the new charity vault!";
+            }
         }
-        console.log(message);
+        setModalMessage(message);
+        setShowModal(true);
     }
 
     return (
@@ -118,9 +117,9 @@ const Create = () => {
                     <Button onClick={deployVault}>Deploy New Vault</Button>
                 </div>
             </div>
-            <Modal show={showReferralModal} handleClose={() => setShowReferralModal(false)}>
+            <Modal show={showModal} handleClose={() => setShowModal(false)}>
                 <span style={{ "font-size": "18px" }}>
-                    {referralLink}
+                    {modalMessage}
                 </span>
             </Modal>
         </Page>
