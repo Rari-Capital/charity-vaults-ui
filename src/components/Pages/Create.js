@@ -11,17 +11,17 @@ import "./Create.css"
 
 
 const Create = () => {
+    const context = useContext(RariContext);
+    const provider = context.web3provider;
+    const signer = context.web3signer;
+
     const [charityAddress, setCharityAddress] = useState(null);
     const [giftRate, setGiftRate] = useState(null);
     const [charityName, setCharityName] = useState(null);
     const [currency, setCurrency] = useState("invalid");
 
     const [showModal, setShowModal] = useState(false);
-    const [modalMessage, setModalMessage] = useState(null)
-
-    const context = useContext(RariContext);
-    const provider = context.web3provider;
-    const signer = context.web3signer;
+    const [modalMessage, setModalMessage] = useState(null);
 
     const generateReferralLink = () => {
         var getUrl = window.location;

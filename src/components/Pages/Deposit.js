@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import Page from "../Page/Page"
+import RariContext from '../../Context';
 import Button from "../Button/Button"
 import Input from "../Input/Input"
 import Modal from "../Modal/Modal"
@@ -7,6 +8,7 @@ import InputHeader from "../Input/InputHeader"
 import Toggle from "react-toggle";
 import { useLocation } from "react-router-dom";
 import { Tokens } from '../../config'
+import { getCharityVaultFactoryContract, getCharityVaultContract } from '../../Contracts';
 import "react-toggle/style.css"
 import "./Deposit.css"
 
@@ -27,6 +29,10 @@ const interestRateOptions = {
 const Deposit = () => {
 	const search = useLocation().search;
 
+	const context = useContext(RariContext);
+	const provider = context.web3provider;
+	const signer = context.web3signer;
+
 	const [showCustomFields, setShowCustomFields] = useState(false);
 	const [referralParamsHandled, setReferralParamsHandled] = useState(false);
 
@@ -45,7 +51,7 @@ const Deposit = () => {
 	const [showDepositModal, setShowDepositModal] = useState(false);
 	const [depositModalMessage, setDepositModalMessage] = useState(null)
 
-	const doDeposit = () => {
+	const doDeposit = async () => {
 		let depositMessage;
 		let errorOccurred = false
 		if (showCustomFields) {
@@ -77,8 +83,19 @@ const Deposit = () => {
 		}
 
 		if (!errorOccurred) {
-			// Do deposit stuff here eventually
-			depositMessage = `Successful deposit!`
+
+			const charityVaultContract = await getCharityVaultContract(Tokens[currency], charityAddress, interestRate, signer);
+
+			// Do deposit here
+			if (charityVaultContract) {
+					// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
+					// depositAmount *= decimals; 
+					await charityVaultContract.deposit(depositAmount);
+					depositMessage = `Successful deposit!`
+			} else {
+					depositMessage = "A charity vault does not exist with the provided information."
+			}
+			
 		}
 
 		setDepositModalMessage(depositMessage);
