@@ -84,13 +84,18 @@ const Deposit = () => {
 
 		if (!errorOccurred) {
 
-			const charityVaultContract = await getCharityVaultContract(Tokens[currency], charityAddress, interestRate, signer);
+			console.log(Tokens[currency]);
+			console.log(charityAddress);
+			console.log(interestRate);
 
+			const charityVaultContract = await getCharityVaultContract(Tokens[currency], "0xBB379331De54A7c0a4b2bfF5A54A14cdba7E9E6d", interestRate, signer);
+			// const charityVaultContract = await getCharityVaultContract("0x5ffbac75efc9547fbc822166fed19b05cd5890bb", "0x05AB381A007A90E541433f3DC574AcD3E389f898", 5, signer);
+			
 			// Do deposit here
 			if (charityVaultContract) {
 					// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
 					// depositAmount *= decimals; 
-					await charityVaultContract.deposit(depositAmount);
+					// await charityVaultContract.deposit(depositAmount);
 					depositMessage = `Successful deposit!`
 			} else {
 					depositMessage = "A charity vault does not exist with the provided information."
