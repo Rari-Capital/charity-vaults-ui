@@ -7,23 +7,18 @@ import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
 import Toggle from "react-toggle";
 import { useLocation } from "react-router-dom";
-import { Tokens } from '../../config'
+import { Tokens, Charities } from '../../config'
 import { getCharityVaultFactoryContract, getCharityVaultContract } from '../../Contracts';
 import "react-toggle/style.css"
 import "./Deposit.css"
 
-const charityOptions = {
-	"Charity 1": "Charity 1",
-	"Charity 2": "Charity 2",
-	"Charity 3": "Charity 3"
-}
 
 const interestRateOptions = {
-	"5": "5%",
-	"10": "10%",
-	"15": "15%",
-	"20": "20%",
-	"25": "25%"
+	5: "5%",
+	10: "10%",
+	15: "15%",
+	20: "20%",
+	25: "25%"
 }
 
 const Deposit = () => {
@@ -52,6 +47,8 @@ const Deposit = () => {
 	const [depositModalMessage, setDepositModalMessage] = useState(null)
 
 	const doDeposit = async () => {
+		let selectedAddress;
+		let selectedInterestRate;
 		let depositMessage;
 		let errorOccurred = false
 		if (showCustomFields) {
@@ -61,6 +58,9 @@ const Deposit = () => {
 			} else if (!customInterestRate || customInterestRate <= 0 || customInterestRate >= 100) {
 				depositMessage = "Must provide a valid gift rate.";
 				errorOccurred = true;
+			} else {
+				selectedAddress = charityAddress;
+				selectedInterestRate = customInterestRate;
 			}
 		} else {
 			if (!charityName || charityName === "invalid") {
@@ -69,6 +69,9 @@ const Deposit = () => {
 			} else if (!interestRate || interestRate === "invalid") {
 				depositMessage = "Must select a gift rate.";
 				errorOccurred = true;
+			} else {
+				selectedAddress = Charities[charityName];
+				selectedInterestRate = interestRate;
 			}
 		}
 
@@ -83,8 +86,9 @@ const Deposit = () => {
 		}
 
 		if (!errorOccurred) {
-
-			const charityVaultContract = await getCharityVaultContract(Tokens[currency], charityAddress, interestRate, signer);
+			console.log(selectedAddress);
+			console.log(selectedInterestRate);
+			const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
 
 			// Do deposit here
 			if (charityVaultContract) {
@@ -122,7 +126,7 @@ const Deposit = () => {
 		name = name.replace("-", " ");
 		let foundName = false;
 		if (name) {
-			for (const [key, value] of Object.entries(charityOptions)) {
+			for (const [key, value] of Object.entries(Charities)) {
 				if(key.toLowerCase() === name.toLowerCase()) {
 					setCharityName(key);
 					foundName = true;
@@ -179,8 +183,8 @@ const Deposit = () => {
 				onChange={(event) => setCharityName(event.target.value)}
 				className="dropdown-container">
 				<option value="invalid">N/A</option>
-				{Object.keys(charityOptions).map(key => (
-					<option value={key}>{charityOptions[key]}</option>
+				{Object.keys(Charities).map(key => (
+					<option value={key}>{key}</option>
 				))}
 			</select>
 			<InputHeader value="SELECT GIFT RATE" />

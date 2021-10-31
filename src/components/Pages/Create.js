@@ -60,6 +60,7 @@ const Create = () => {
         } else if (!signer) {
             message = "Must connect to a wallet.";
         } else {
+
             const existingCharityVault = await getCharityVaultContract(Tokens[currency], charityAddress, giftRate, signer);
 
             if (existingCharityVault) {

@@ -13,3 +13,9 @@ export const Tokens = {
     "USDC": "0x5ffbac75efc9547fbc822166fed19b05cd5890bb",
     "ETH": "insert-here",
 }
+
+export const Charities = {
+	"Charity 1": "address-here",
+	"Charity 2": "address-here",
+	"Charity 3": "address-here"
+}
