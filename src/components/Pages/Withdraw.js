@@ -149,7 +149,8 @@ const Withdraw = () => {
                     <Button onClick={() => initiateWithdraw()}>Withdraw</Button>
                 </div>
             </div>
-            <Modal show={showWithdrawModal} buttonText="Confirm Withdrawal" handleClose={() => doWithdraw()}>
+            <Modal show={showWithdrawModal} buttonText="Confirm Withdrawal" extraButtonText="Cancel"
+			extraButtonClick={() => setShowWithdrawModal(false)} handleClose={() => doWithdraw()}>
                 <div>
                     <h2 className="modal-header">{selectedRowInfo ? selectedRowInfo.charity_name : ""}</h2>
                     <div>
