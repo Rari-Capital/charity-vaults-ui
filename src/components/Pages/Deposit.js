@@ -7,23 +7,18 @@ import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
 import Toggle from "react-toggle";
 import { useLocation } from "react-router-dom";
-import { Tokens } from '../../config'
+import { Tokens, Charities } from '../../config'
 import { getCharityVaultFactoryContract, getCharityVaultContract } from '../../Contracts';
 import "react-toggle/style.css"
 import "./Deposit.css"
 
-const charityOptions = {
-	"Charity 1": "Charity 1",
-	"Charity 2": "Charity 2",
-	"Charity 3": "Charity 3"
-}
 
 const interestRateOptions = {
-	"5": "5%",
-	"10": "10%",
-	"15": "15%",
-	"20": "20%",
-	"25": "25%"
+	5: "5%",
+	10: "10%",
+	15: "15%",
+	20: "20%",
+	25: "25%"
 }
 
 const Deposit = () => {
@@ -48,10 +43,14 @@ const Deposit = () => {
 	const [currency, setCurrency] = useState("invalid");
 	const [depositAmount, setDepositAmount] = useState(null);
 
+	const [showDepositConfirmationModal, setShowDepositConfirmationModal] = useState(false);
+
 	const [showDepositModal, setShowDepositModal] = useState(false);
 	const [depositModalMessage, setDepositModalMessage] = useState(null)
 
-	const doDeposit = async () => {
+	const initiateDeposit = async () => {
+		let selectedAddress;
+		let selectedInterestRate;
 		let depositMessage;
 		let errorOccurred = false
 		if (showCustomFields) {
@@ -61,6 +60,9 @@ const Deposit = () => {
 			} else if (!customInterestRate || customInterestRate <= 0 || customInterestRate >= 100) {
 				depositMessage = "Must provide a valid gift rate.";
 				errorOccurred = true;
+			} else {
+				selectedAddress = charityAddress;
+				selectedInterestRate = customInterestRate;
 			}
 		} else {
 			if (!charityName || charityName === "invalid") {
@@ -69,6 +71,9 @@ const Deposit = () => {
 			} else if (!interestRate || interestRate === "invalid") {
 				depositMessage = "Must select a gift rate.";
 				errorOccurred = true;
+			} else {
+				selectedAddress = Charities[charityName];
+				selectedInterestRate = interestRate;
 			}
 		}
 
@@ -83,26 +88,42 @@ const Deposit = () => {
 		}
 
 		if (!errorOccurred) {
-
-			console.log(Tokens[currency]);
-			console.log(charityAddress);
-			console.log(interestRate);
-
-			const charityVaultContract = await getCharityVaultContract(Tokens[currency], "0xBB379331De54A7c0a4b2bfF5A54A14cdba7E9E6d", interestRate, signer);
-			// const charityVaultContract = await getCharityVaultContract("0x5ffbac75efc9547fbc822166fed19b05cd5890bb", "0x05AB381A007A90E541433f3DC574AcD3E389f898", 5, signer);
-			
+			const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
 			// Do deposit here
-			if (charityVaultContract) {
-					// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
-					// depositAmount *= decimals; 
-					// await charityVaultContract.deposit(depositAmount);
-					depositMessage = `Successful deposit!`
-			} else {
-					depositMessage = "A charity vault does not exist with the provided information."
+			if (!charityVaultContract) {
+				depositMessage = "A charity vault does not exist with the provided information.";
+				errorOccurred = true;
 			}
 			
 		}
 
+		if(errorOccurred) {
+			// Show the modal with error message.
+			setDepositModalMessage(depositMessage);
+			setShowDepositModal(true);
+		} else {
+			// Bring up the confirmation Modal.
+			setShowDepositConfirmationModal(true);
+		}
+	}
+
+	const doDeposit = async () => {
+		let depositMessage;
+		let selectedAddress;
+		let selectedInterestRate;
+		if (showCustomFields) {
+			selectedAddress = charityAddress;
+			selectedInterestRate = customInterestRate;
+		} else {
+			selectedAddress = Charities[charityName];
+			selectedInterestRate = interestRate;
+		}
+		const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
+		// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
+		// depositAmount *= decimals; 
+		// await charityVaultContract.deposit(depositAmount);
+		depositMessage = `Successful deposit!`;
+		setShowDepositConfirmationModal(false);
 		setDepositModalMessage(depositMessage);
 		setShowDepositModal(true);
 	}
@@ -127,7 +148,7 @@ const Deposit = () => {
 		name = name.replace("-", " ");
 		let foundName = false;
 		if (name) {
-			for (const [key, value] of Object.entries(charityOptions)) {
+			for (const [key, value] of Object.entries(Charities)) {
 				if(key.toLowerCase() === name.toLowerCase()) {
 					setCharityName(key);
 					foundName = true;
@@ -184,8 +205,8 @@ const Deposit = () => {
 				onChange={(event) => setCharityName(event.target.value)}
 				className="dropdown-container">
 				<option value="invalid">N/A</option>
-				{Object.keys(charityOptions).map(key => (
-					<option value={key}>{charityOptions[key]}</option>
+				{Object.keys(Charities).map(key => (
+					<option value={key}>{key}</option>
 				))}
 			</select>
 			<InputHeader value="SELECT GIFT RATE" />
@@ -242,16 +263,28 @@ const Deposit = () => {
 
 				<div className="create-buttons-container">
 					<Button isDark={true} onClick={doReset}>Reset</Button>
-					<Button onClick={doDeposit}>Deposit</Button>
+					<Button onClick={initiateDeposit}>Deposit</Button>
 				</div>
 			</div>
+			<Modal show={showDepositConfirmationModal} buttonText="Confirm Deposit" extraButtonText="Cancel"
+			extraButtonClick={() => setShowDepositConfirmationModal(false)} handleClose={() => doDeposit()}>
+                <div>
+                    <h2 className="modal-header">Deposit Information</h2>
+                    <div>
+                        <span className="modal-span"><strong>Gift Rate:</strong> {showCustomFields ? interestRate : customInterestRate}%</span>
+                    </div>
+                    <div>
+                        <span className="modal-span"><strong>Amount To Deposit:</strong> {depositAmount} {currency}</span>
+                    </div>
+                </div>
+            </Modal>
 			<Modal show={showDepositModal} handleClose={() => setShowDepositModal(false)}>
 				<span style={{ "font-size": "18px" }}>
 					{depositModalMessage}
 				</span>
 			</Modal>
 		</Page>
-	)
+	);
 }
 
 export default Deposit;
