@@ -43,10 +43,12 @@ const Deposit = () => {
 	const [currency, setCurrency] = useState("invalid");
 	const [depositAmount, setDepositAmount] = useState(null);
 
+	const [showDepositConfirmationModal, setShowDepositConfirmationModal] = useState(false);
+
 	const [showDepositModal, setShowDepositModal] = useState(false);
 	const [depositModalMessage, setDepositModalMessage] = useState(null)
 
-	const doDeposit = async () => {
+	const initiateDeposit = async () => {
 		let selectedAddress;
 		let selectedInterestRate;
 		let depositMessage;
@@ -86,22 +88,42 @@ const Deposit = () => {
 		}
 
 		if (!errorOccurred) {
-			console.log(selectedAddress);
-			console.log(selectedInterestRate);
 			const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
-
 			// Do deposit here
-			if (charityVaultContract) {
-					// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
-					// depositAmount *= decimals; 
-					await charityVaultContract.deposit(depositAmount);
-					depositMessage = `Successful deposit!`
-			} else {
-					depositMessage = "A charity vault does not exist with the provided information."
+			if (!charityVaultContract) {
+				depositMessage = "A charity vault does not exist with the provided information.";
+				errorOccurred = true;
 			}
 			
 		}
 
+		if(errorOccurred) {
+			// Show the modal with error message.
+			setDepositModalMessage(depositMessage);
+			setShowDepositModal(true);
+		} else {
+			// Bring up the confirmation Modal.
+			setShowDepositConfirmationModal(true);
+		}
+	}
+
+	const doDeposit = async () => {
+		let depositMessage;
+		let selectedAddress;
+		let selectedInterestRate;
+		if (showCustomFields) {
+			selectedAddress = charityAddress;
+			selectedInterestRate = customInterestRate;
+		} else {
+			selectedAddress = Charities[charityName];
+			selectedInterestRate = interestRate;
+		}
+		const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
+		// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
+		// depositAmount *= decimals; 
+		// await charityVaultContract.deposit(depositAmount);
+		depositMessage = `Successful deposit!`;
+		setShowDepositConfirmationModal(false);
 		setDepositModalMessage(depositMessage);
 		setShowDepositModal(true);
 	}
@@ -241,16 +263,28 @@ const Deposit = () => {
 
 				<div className="create-buttons-container">
 					<Button isDark={true} onClick={doReset}>Reset</Button>
-					<Button onClick={doDeposit}>Deposit</Button>
+					<Button onClick={initiateDeposit}>Deposit</Button>
 				</div>
 			</div>
+			<Modal show={showDepositConfirmationModal} buttonText="Confirm Deposit" extraButtonText="Cancel"
+			extraButtonClick={() => setShowDepositConfirmationModal(false)} handleClose={() => doDeposit()}>
+                <div>
+                    <h2 className="modal-header">Deposit Information</h2>
+                    <div>
+                        <span className="modal-span"><strong>Gift Rate:</strong> {showCustomFields ? interestRate : customInterestRate}%</span>
+                    </div>
+                    <div>
+                        <span className="modal-span"><strong>Amount To Deposit:</strong> {depositAmount} {currency}</span>
+                    </div>
+                </div>
+            </Modal>
 			<Modal show={showDepositModal} handleClose={() => setShowDepositModal(false)}>
 				<span style={{ "font-size": "18px" }}>
 					{depositModalMessage}
 				</span>
 			</Modal>
 		</Page>
-	)
+	);
 }
 
 export default Deposit;
