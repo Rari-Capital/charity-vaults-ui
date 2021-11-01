@@ -8,7 +8,8 @@ import InputHeader from "../Input/InputHeader"
 import Toggle from "react-toggle";
 import { useLocation } from "react-router-dom";
 import { Tokens, Charities } from '../../config'
-import { getCharityVaultFactoryContract, getCharityVaultContract } from '../../Contracts';
+import { getCharityVaultFactoryContract, getCharityVaultContract,
+		 getCharityVaultContractAddress, getUnderlyingContractByAddress } from '../../Contracts';
 import "react-toggle/style.css"
 import "./Deposit.css"
 
@@ -88,6 +89,9 @@ const Deposit = () => {
 		}
 
 		if (!errorOccurred) {
+			console.log(Tokens[currency]);
+			console.log(selectedAddress);
+			console.log(selectedInterestRate);
 			const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
 			// Do deposit here
 			if (!charityVaultContract) {
@@ -118,10 +122,18 @@ const Deposit = () => {
 			selectedAddress = Charities[charityName];
 			selectedInterestRate = interestRate;
 		}
+
+		const underlyingContract = getUnderlyingContractByAddress(Tokens[currency], signer);
 		const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
+		const charityVaultContractAddress = await getCharityVaultContractAddress(Tokens[currency], selectedAddress, selectedInterestRate, signer);
+		console.log("Deposit to:", charityVaultContractAddress);
+
 		// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
 		// depositAmount *= decimals; 
-		// await charityVaultContract.deposit(depositAmount);
+
+		await underlyingContract.approve(charityVaultContractAddress, 1000000000);
+		await charityVaultContract.deposit(depositAmount);
+
 		depositMessage = `Successful deposit!`;
 		setShowDepositConfirmationModal(false);
 		setDepositModalMessage(depositMessage);
