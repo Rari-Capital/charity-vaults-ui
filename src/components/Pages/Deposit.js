@@ -5,6 +5,8 @@ import Button from "../Button/Button"
 import Input from "../Input/Input"
 import Modal from "../Modal/Modal"
 import InputHeader from "../Input/InputHeader"
+import { ethers } from 'ethers';
+import bigInt from "big-integer";
 import Toggle from "react-toggle";
 import { useLocation } from "react-router-dom";
 import { Tokens, Charities } from '../../config'
@@ -47,7 +49,9 @@ const Deposit = () => {
 	const [showDepositConfirmationModal, setShowDepositConfirmationModal] = useState(false);
 
 	const [showDepositModal, setShowDepositModal] = useState(false);
-	const [depositModalMessage, setDepositModalMessage] = useState(null)
+	const [depositModalMessage, setDepositModalMessage] = useState(null);
+
+	const [isApproved, setIsApproved] = useState(false);
 
 	const initiateDeposit = async () => {
 		let selectedAddress;
@@ -92,11 +96,26 @@ const Deposit = () => {
 			console.log(Tokens[currency]);
 			console.log(selectedAddress);
 			console.log(selectedInterestRate);
+			
+			const underlyingContract = getUnderlyingContractByAddress(Tokens[currency], signer);
 			const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
-			// Do deposit here
+			const charityVaultContractAddress = await getCharityVaultContractAddress(Tokens[currency], selectedAddress, selectedInterestRate, signer);
+			
 			if (!charityVaultContract) {
 				depositMessage = "A charity vault does not exist with the provided information.";
 				errorOccurred = true;
+			} else {
+				// If contract exists, check if user needs to approve tokens or not
+				let allowance = await underlyingContract.allowance(signer.getAddress(), charityVaultContractAddress);
+				console.log(allowance, ethers.BigNumber.from(String(bigInt(depositAmount * (10**18)))));
+				// User has allowance to deposit underlying
+				if (allowance >= ethers.BigNumber.from(String(bigInt(depositAmount * (10**18))))) {
+					setIsApproved(true);
+					
+				} else { // User does NOT have allowance to deposit underlying
+					setIsApproved(false);
+				}
+				console.log(isApproved);
 			}
 			
 		}
@@ -126,18 +145,20 @@ const Deposit = () => {
 		const underlyingContract = getUnderlyingContractByAddress(Tokens[currency], signer);
 		const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
 		const charityVaultContractAddress = await getCharityVaultContractAddress(Tokens[currency], selectedAddress, selectedInterestRate, signer);
-		console.log("Deposit to:", charityVaultContractAddress);
+		console.log(isApproved);
+		if (isApproved) {
+			// we need to multiply deposit amount to add 18 decimals for (most) erc-20 token contracts
+			await charityVaultContract.deposit(String(bigInt(depositAmount * (10**18))));
+			console.log("Deposit to:", charityVaultContractAddress);
+			depositMessage = `Successful deposit!`;
+			setShowDepositConfirmationModal(false);
+			setDepositModalMessage(depositMessage);
+			setShowDepositModal(true);
+		} else {
+			await underlyingContract.approve(charityVaultContractAddress, String(bigInt(depositAmount * (10**18))));
+			depositMessage = `Approving underlying!`;
+		}
 
-		// TODO: do we need to convert erc-20 to proper decimal input before calling deposit?
-		// depositAmount *= decimals; 
-
-		await underlyingContract.approve(charityVaultContractAddress, 1000000000);
-		await charityVaultContract.deposit(depositAmount);
-
-		depositMessage = `Successful deposit!`;
-		setShowDepositConfirmationModal(false);
-		setDepositModalMessage(depositMessage);
-		setShowDepositModal(true);
 	}
 
 	const doReset = () => {
@@ -278,7 +299,7 @@ const Deposit = () => {
 					<Button onClick={initiateDeposit}>Deposit</Button>
 				</div>
 			</div>
-			<Modal show={showDepositConfirmationModal} buttonText="Confirm Deposit" extraButtonText="Cancel"
+			<Modal show={showDepositConfirmationModal} buttonText="Approve / Deposit" extraButtonText="Cancel"
 			extraButtonClick={() => setShowDepositConfirmationModal(false)} handleClose={() => doDeposit()}>
                 <div>
                     <h2 className="modal-header">Deposit Information</h2>
