@@ -47,6 +47,7 @@ const Deposit = () => {
 	const [depositAmount, setDepositAmount] = useState(null);
 
 	const [showDepositConfirmationModal, setShowDepositConfirmationModal] = useState(false);
+	const [showDepositApprovalModal, setShowDepositApprovalModal] = useState(false);
 
 	const [showDepositModal, setShowDepositModal] = useState(false);
 	const [depositModalMessage, setDepositModalMessage] = useState(null);
@@ -93,10 +94,6 @@ const Deposit = () => {
 		}
 
 		if (!errorOccurred) {
-			console.log(Tokens[currency]);
-			console.log(selectedAddress);
-			console.log(selectedInterestRate);
-			
 			const underlyingContract = getUnderlyingContractByAddress(Tokens[currency], signer);
 			const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
 			const charityVaultContractAddress = await getCharityVaultContractAddress(Tokens[currency], selectedAddress, selectedInterestRate, signer);
@@ -107,27 +104,44 @@ const Deposit = () => {
 			} else {
 				// If contract exists, check if user needs to approve tokens or not
 				let allowance = await underlyingContract.allowance(signer.getAddress(), charityVaultContractAddress);
-				console.log(allowance, ethers.BigNumber.from(String(bigInt(depositAmount * (10**18)))));
+
 				// User has allowance to deposit underlying
 				if (allowance >= ethers.BigNumber.from(String(bigInt(depositAmount * (10**18))))) {
+					setShowDepositConfirmationModal(true);
 					setIsApproved(true);
 					
 				} else { // User does NOT have allowance to deposit underlying
 					setIsApproved(false);
+					setShowDepositApprovalModal(true);
 				}
-				console.log(isApproved);
 			}
-			
 		}
 
 		if(errorOccurred) {
 			// Show the modal with error message.
 			setDepositModalMessage(depositMessage);
 			setShowDepositModal(true);
-		} else {
-			// Bring up the confirmation Modal.
-			setShowDepositConfirmationModal(true);
 		}
+	}
+
+	const doApproval = async () => {
+		let selectedAddress;
+		let selectedInterestRate;
+		if (showCustomFields) {
+			selectedAddress = charityAddress;
+			selectedInterestRate = customInterestRate;
+		} else {
+			selectedAddress = Charities[charityName];
+			selectedInterestRate = interestRate;
+		}
+
+		const underlyingContract = getUnderlyingContractByAddress(Tokens[currency], signer);
+		const charityVaultContractAddress = await getCharityVaultContractAddress(Tokens[currency], selectedAddress, selectedInterestRate, signer);
+		
+		await underlyingContract.approve(charityVaultContractAddress, String(bigInt(depositAmount * (10**18))));
+		setShowDepositApprovalModal(false);
+		setDepositModalMessage("Approving Underlying! Monitor your wallet for the transaction status!");
+		setShowDepositModal(true);
 	}
 
 	const doDeposit = async () => {
@@ -142,23 +156,15 @@ const Deposit = () => {
 			selectedInterestRate = interestRate;
 		}
 
-		const underlyingContract = getUnderlyingContractByAddress(Tokens[currency], signer);
 		const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
-		const charityVaultContractAddress = await getCharityVaultContractAddress(Tokens[currency], selectedAddress, selectedInterestRate, signer);
-		console.log(isApproved);
-		if (isApproved) {
-			// we need to multiply deposit amount to add 18 decimals for (most) erc-20 token contracts
-			await charityVaultContract.deposit(String(bigInt(depositAmount * (10**18))));
-			console.log("Deposit to:", charityVaultContractAddress);
-			depositMessage = `Successful deposit!`;
-			setShowDepositConfirmationModal(false);
-			setDepositModalMessage(depositMessage);
-			setShowDepositModal(true);
-		} else {
-			await underlyingContract.approve(charityVaultContractAddress, String(bigInt(depositAmount * (10**18))));
-			depositMessage = `Approving underlying!`;
-		}
+		
+		// we need to multiply deposit amount to add 18 decimals for (most) erc-20 token contracts
+		await charityVaultContract.deposit(String(bigInt(depositAmount * (10**18))));
 
+		depositMessage = `Successful deposit!`;
+		setShowDepositConfirmationModal(false);
+		setDepositModalMessage(depositMessage);
+		setShowDepositModal(true);
 	}
 
 	const doReset = () => {
@@ -296,18 +302,30 @@ const Deposit = () => {
 
 				<div className="create-buttons-container">
 					<Button isDark={true} onClick={doReset}>Reset</Button>
-					<Button onClick={initiateDeposit}>Deposit</Button>
+					<Button onClick={initiateDeposit}>Approve / Deposit</Button>
 				</div>
 			</div>
-			<Modal show={showDepositConfirmationModal} buttonText="Approve / Deposit" extraButtonText="Cancel"
+			<Modal show={showDepositConfirmationModal} buttonText="Deposit" extraButtonText="Cancel"
 			extraButtonClick={() => setShowDepositConfirmationModal(false)} handleClose={() => doDeposit()}>
                 <div>
                     <h2 className="modal-header">Deposit Information</h2>
                     <div>
-                        <span className="modal-span"><strong>Gift Rate:</strong> {showCustomFields ? interestRate : customInterestRate}%</span>
+                        <span className="modal-span"><strong>Gift Rate:</strong> {showCustomFields ? customInterestRate : interestRate}%</span>
                     </div>
                     <div>
                         <span className="modal-span"><strong>Amount To Deposit:</strong> {depositAmount} {currency}</span>
+                    </div>
+                </div>
+            </Modal>
+			<Modal show={showDepositApprovalModal} buttonText="Approve" extraButtonText="Cancel"
+			extraButtonClick={() => setShowDepositApprovalModal(false)} handleClose={() => doApproval()}>
+                <div>
+                    <h2 className="modal-header">Deposit Information</h2>
+                    <div>
+                        <span className="modal-span"><strong>Gift Rate:</strong> {showCustomFields ? customInterestRate : interestRate}%</span>
+                    </div>
+                    <div>
+                        <span className="modal-span"><strong>Amount To Approve:</strong> {depositAmount} {currency}</span>
                     </div>
                 </div>
             </Modal>
