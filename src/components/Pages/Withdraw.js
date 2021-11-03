@@ -7,34 +7,35 @@ import { useTable } from 'react-table';
 import { ethers } from 'ethers'
 import { getCharityVaultFactoryContract, getCharityVaultContractByAddress } from './../../Contracts'
 import RariContext from '../../Context';
+import { getTokenFromAddress, getCharityFromAddress } from '../../helpers'
 import "./Withdraw.css"
 
 
-const currentDeposits = [
-    {
-        "charity_name": "Charity 1",
-        "token": "ETH",
-        "rate": 5,
-        "amount": 10,
-    },
-    {
-        "charity_name": "Charity 2",
-        "token": "ETH",
-        "rate": 8,
-        "amount": 12,
-    },
-    {
-        "charity_name": "47f7sf6af7as7f6...",
-        "token": "BTC",
-        "rate": 15,
-        "amount": 3,
-    },
-    {
-        "charity_name": "Charity 3",
-        "token": "USDT",
-        "rate": 20,
-        "amount": 2000,
-    },
+let currentDeposits = [
+    // {
+    //     "charity_name": "Charity 1",
+    //     "token": "ETH",
+    //     "rate": 5,
+    //     "amount": 10,
+    // },
+    // {
+    //     "charity_name": "Charity 2",
+    //     "token": "ETH",
+    //     "rate": 8,
+    //     "amount": 12,
+    // },
+    // {
+    //     "charity_name": "47f7sf6af7as7f6...",
+    //     "token": "BTC",
+    //     "rate": 15,
+    //     "amount": 3,
+    // },
+    // {
+    //     "charity_name": "Charity 3",
+    //     "token": "USDT",
+    //     "rate": 20,
+    //     "amount": 2000,
+    // },
 ];
 
 const withdrawColumns = [
@@ -62,7 +63,7 @@ const Withdraw = () => {
     const signer = context.web3signer;
     
     const columns = useMemo(() => withdrawColumns, []);
-    const data = useMemo(() => currentDeposits, []);
+    const data = useMemo(() => currentDeposits, [currentDeposits]);
 
     const [selectedRowInfo, setSelectedRowInfo] = useState(null);
     let selectedRowVaultName;
@@ -78,6 +79,8 @@ const Withdraw = () => {
 
     const [amountToWithdraw, setAmountToWithdraw] = useState("");
 
+    console.log("data is");
+    console.log(data);
     const withdrawTableInstance = useTable({
         columns: columns,
         data: data,
@@ -89,16 +92,35 @@ const Withdraw = () => {
         const filter = vaultFactoryContract.filters.CharityVaultDeployed(null, null);
         const events = await vaultFactoryContract.queryFilter(filter);
 
+        let newCurrentDeposits = [];
+
         // We now have the deployed vault addresses and we need the deposited balances.
         // We can do this by looking at the user's balance of the tokens.
         events.forEach(async (event, i) => {
-            console.log(event.args.vault);
             let charityVault = getCharityVaultContractByAddress(event.args.vault, signer);
-            console.log(provider.provider.selectedAddress);
             let balance = await charityVault.balanceOf(provider.provider.selectedAddress);
             balance = ethers.utils.formatEther(balance);
-            console.log(balance);
+            if(balance > 0) {
+                // Build deposit object
+                let charity = await charityVault.CHARITY();
+                let underlying = await charityVault.UNDERLYING();
+                let rate = await charityVault.BASE_FEE();
+                let deposit = {
+                    "charity_name": getCharityFromAddress(charity),
+                    "token": getTokenFromAddress(underlying),
+                    "rate": parseInt(rate),
+                    "amount": balance,
+                }
+                newCurrentDeposits.push(deposit);
+            }
         })
+        console.log("Updating current deposits")
+        console.log(currentDeposits);
+        currentDeposits = newCurrentDeposits;
+
+        // Set current deposits to new current deposits.
+        console.log("Updated");
+        console.log(currentDeposits);
     }, []);
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = withdrawTableInstance;
