@@ -1,9 +1,12 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect, useContext } from 'react'
 import Button from "../Button/Button"
 import Modal from "../Modal/Modal"
 import Input from "../Input/Input"
 import Page from "../Page/Page"
 import { useTable } from 'react-table';
+import { ethers } from 'ethers'
+import { getCharityVaultFactoryContract, getCharityVaultContractByAddress } from './../../Contracts'
+import RariContext from '../../Context';
 import "./Withdraw.css"
 
 
@@ -54,6 +57,10 @@ const withdrawColumns = [
 ]
 
 const Withdraw = () => {
+    const context = useContext(RariContext);
+	const provider = context.web3provider;
+    const signer = context.web3signer;
+    
     const columns = useMemo(() => withdrawColumns, []);
     const data = useMemo(() => currentDeposits, []);
 
@@ -75,6 +82,24 @@ const Withdraw = () => {
         columns: columns,
         data: data,
     });
+
+
+    useEffect(async () => {
+        const vaultFactoryContract = getCharityVaultFactoryContract(signer);
+        const filter = vaultFactoryContract.filters.CharityVaultDeployed(null, null);
+        const events = await vaultFactoryContract.queryFilter(filter);
+
+        // We now have the deployed vault addresses and we need the deposited balances.
+        // We can do this by looking at the user's balance of the tokens.
+        events.forEach(async (event, i) => {
+            console.log(event.args.vault);
+            let charityVault = getCharityVaultContractByAddress(event.args.vault, signer);
+            console.log(provider.provider.selectedAddress);
+            let balance = await charityVault.balanceOf(provider.provider.selectedAddress);
+            balance = ethers.utils.formatEther(balance);
+            console.log(balance);
+        })
+    }, []);
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = withdrawTableInstance;
 
@@ -150,7 +175,7 @@ const Withdraw = () => {
                 </div>
             </div>
             <Modal show={showWithdrawModal} buttonText="Confirm Withdrawal" extraButtonText="Cancel"
-			extraButtonClick={() => setShowWithdrawModal(false)} handleClose={() => doWithdraw()}>
+                extraButtonClick={() => setShowWithdrawModal(false)} handleClose={() => doWithdraw()}>
                 <div>
                     <h2 className="modal-header">{selectedRowInfo ? selectedRowInfo.charity_name : ""}</h2>
                     <div>
