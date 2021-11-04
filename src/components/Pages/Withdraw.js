@@ -9,34 +9,8 @@ import { getCharityVaultFactoryContract, getCharityVaultContractByAddress } from
 import RariContext from '../../Context';
 import { getTokenFromAddress, getCharityFromAddress } from '../../helpers'
 import "./Withdraw.css"
+import { connectCachedProvider } from './Connect';
 
-
-let currentDeposits = [
-    // {
-    //     "charity_name": "Charity 1",
-    //     "token": "ETH",
-    //     "rate": 5,
-    //     "amount": 10,
-    // },
-    // {
-    //     "charity_name": "Charity 2",
-    //     "token": "ETH",
-    //     "rate": 8,
-    //     "amount": 12,
-    // },
-    // {
-    //     "charity_name": "47f7sf6af7as7f6...",
-    //     "token": "BTC",
-    //     "rate": 15,
-    //     "amount": 3,
-    // },
-    // {
-    //     "charity_name": "Charity 3",
-    //     "token": "USDT",
-    //     "rate": 20,
-    //     "amount": 2000,
-    // },
-];
 
 const withdrawColumns = [
     {
@@ -57,13 +31,69 @@ const withdrawColumns = [
     },
 ]
 
+const WithdrawTable = ({ columns, data, selectedRowVaultName, setSelectedRowInfo, isLoading }) => {
+    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+        columns: columns,
+        data: data,
+    });
+
+    let messageSpan = <span className="withdraw-table-span">Loading</span>;
+    let body;
+    if (!isLoading) {
+        if (rows) {
+            body = <tbody {...getTableBodyProps()}>
+                {rows.map(row => {
+                    prepareRow(row)
+                    return (
+                        <tr {...row.getRowProps()} id={row.original.charity_name === selectedRowVaultName ? "selected-row" : ""}
+                            onClick={() => setSelectedRowInfo(row.original)}>
+                            {row.cells.map((cell) => {
+                                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+                            })}
+                        </tr>
+                    )
+                })}
+            </tbody>;
+            messageSpan = null;
+        } else {
+            messageSpan = <span className="withdraw-table-span">No Current Deposits</span>
+        }
+    }
+
+    return (
+        <>
+            <table {...getTableProps()}>
+                <thead>
+                    {headerGroups.map(headerGroups => (
+                        <tr {...headerGroups.getHeaderGroupProps()}>
+                            {headerGroups.headers.map(column => (
+                                <th {...column.getHeaderProps()}>
+                                    {column.render('Header')}
+                                </th>
+                            ))
+                            }
+                        </tr>
+                    ))}
+                </thead>
+                {body}
+            </table>
+            {messageSpan}
+        </>
+    );
+}
+
 const Withdraw = () => {
     const context = useContext(RariContext);
-	const provider = context.web3provider;
+    const provider = context.web3provider;
     const signer = context.web3signer;
-    
+    const setProvider = context.setProvider;
+    const setSigner = context.setSigner;
+
+    const [depositData, setDepositData] = useState([]);
+    const [gotDepositData, setGotDepositData] = useState(false);
+    const [isLoadingData, setIsLoadingData] = useState(false);
+
     const columns = useMemo(() => withdrawColumns, []);
-    const data = useMemo(() => currentDeposits, [currentDeposits]);
 
     const [selectedRowInfo, setSelectedRowInfo] = useState(null);
     let selectedRowVaultName;
@@ -79,15 +109,10 @@ const Withdraw = () => {
 
     const [amountToWithdraw, setAmountToWithdraw] = useState("");
 
-    console.log("data is");
-    console.log(data);
-    const withdrawTableInstance = useTable({
-        columns: columns,
-        data: data,
-    });
+    const getDepositData = async () => {
+        connectCachedProvider(provider, setProvider, setSigner);
 
-
-    useEffect(async () => {
+        setIsLoadingData(true);
         const vaultFactoryContract = getCharityVaultFactoryContract(signer);
         const filter = vaultFactoryContract.filters.CharityVaultDeployed(null, null);
         const events = await vaultFactoryContract.queryFilter(filter);
@@ -96,34 +121,34 @@ const Withdraw = () => {
 
         // We now have the deployed vault addresses and we need the deposited balances.
         // We can do this by looking at the user's balance of the tokens.
-        events.forEach(async (event, i) => {
+        for (const event of events) {
             let charityVault = getCharityVaultContractByAddress(event.args.vault, signer);
             let balance = await charityVault.balanceOf(provider.provider.selectedAddress);
             balance = ethers.utils.formatEther(balance);
-            if(balance > 0) {
+            if (balance > 0) {
                 // Build deposit object
                 let charity = await charityVault.CHARITY();
                 let underlying = await charityVault.UNDERLYING();
                 let rate = await charityVault.BASE_FEE();
-                let deposit = {
+                newCurrentDeposits.push({
                     "charity_name": getCharityFromAddress(charity),
                     "token": getTokenFromAddress(underlying),
                     "rate": parseInt(rate),
                     "amount": balance,
-                }
-                newCurrentDeposits.push(deposit);
+                });
             }
-        })
-        console.log("Updating current deposits")
-        console.log(currentDeposits);
-        currentDeposits = newCurrentDeposits;
+        };
+        setDepositData(newCurrentDeposits);
 
         // Set current deposits to new current deposits.
-        console.log("Updated");
-        console.log(currentDeposits);
-    }, []);
+        setSelectedRowInfo(null);
+        setIsLoadingData(false);
+        setGotDepositData(true);
+    };
 
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = withdrawTableInstance;
+    if (!gotDepositData && !isLoadingData) {
+        getDepositData();
+    }
 
     const initiateWithdraw = () => {
         let withdrawModalContent;
@@ -163,33 +188,7 @@ const Withdraw = () => {
                     <h6 className="withdraw-subheader">Select one of your deposits to withdraw.</h6>
                 </div>
                 <div className="table-container">
-                    <table {...getTableProps()}>
-                        <thead>
-                            {headerGroups.map(headerGroups => (
-                                <tr {...headerGroups.getHeaderGroupProps()}>
-                                    {headerGroups.headers.map(column => (
-                                        <th {...column.getHeaderProps()}>
-                                            {column.render('Header')}
-                                        </th>
-                                    ))
-                                    }
-                                </tr>
-                            ))}
-                        </thead>
-                        <tbody {...getTableBodyProps()}>
-                            {rows.map(row => {
-                                prepareRow(row)
-                                return (
-                                    <tr {...row.getRowProps()} id={row.original.charity_name === selectedRowVaultName ? "selected-row" : ""}
-                                        onClick={() => setSelectedRowInfo(row.original)}>
-                                        {row.cells.map((cell) => {
-                                            return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                                        })}
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
+                    <WithdrawTable data={depositData} columns={columns} selectedRowVaultName={selectedRowVaultName} setSelectedRowInfo={setSelectedRowInfo} isLoading={isLoadingData} />
                 </div>
                 <div className="withdraw-buttons-container">
                     <Button isDark={true} onClick={() => setSelectedRowInfo(null)}>Deselect</Button>
