@@ -5,6 +5,7 @@ import Input from "../Input/Input"
 import Page from "../Page/Page"
 import { useTable } from 'react-table';
 import { ethers } from 'ethers'
+import bigInt from "big-integer";
 import { getCharityVaultFactoryContract, getCharityVaultContractByAddress } from './../../Contracts'
 import RariContext from '../../Context';
 import { getTokenFromAddress, getCharityFromAddress } from '../../helpers'
@@ -131,6 +132,7 @@ const Withdraw = () => {
                 let underlying = await charityVault.UNDERLYING();
                 let rate = await charityVault.BASE_FEE();
                 newCurrentDeposits.push({
+                    "charity_vault_address": event.args.vault,
                     "charity_name": getCharityFromAddress(charity),
                     "token": getTokenFromAddress(underlying),
                     "rate": parseInt(rate),
@@ -163,15 +165,19 @@ const Withdraw = () => {
         }
     }
 
-    const doWithdraw = () => {
+    const doWithdraw = async () => {
         let withdrawMessage;
         if (!amountToWithdraw) {
             withdrawMessage = "Must enter an amount to withdraw";
         } else if (amountToWithdraw <= 0) {
             withdrawMessage = "Must withdraw a positive amount";
         } else if (amountToWithdraw > selectedRowInfo.amount) {
+            console.log("Cannot withdraw more than the deposit amount");
             withdrawMessage = "Cannot withdraw more than the deposit amount";
         } else {
+            // Do withdraw
+            let charityVault = getCharityVaultContractByAddress(selectedRowInfo.charity_vault_address, signer);
+            await charityVault.withdraw(String(bigInt(amountToWithdraw * (10**18))));
             withdrawMessage = "Withdrew successfully!";
         }
         setShowWithdrawModal(false);
