@@ -5,6 +5,7 @@ import NavBar from "./components/NavBar"
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Home from './components/Pages/Home';
 import Create from './components/Pages/Create';
+import Harvest from './components/Pages/Harvest';
 import Deposit from './components/Pages/Deposit';
 import Withdraw from './components/Pages/Withdraw';
 import Connect, { connectCachedProvider } from './components/Pages/Connect';
@@ -38,6 +39,7 @@ function App() {
             <Switch>
               <Route exact path="/" component={Home} />
               <Route path="/create" component={Create} />
+              <Route path="/harvest" component={Harvest} />
               <Route path="/deposit" component={Deposit} />
               <Route path="/withdraw" component={Withdraw} />
               <Route path="/connect" component={Connect} />
