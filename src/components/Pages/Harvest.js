@@ -31,6 +31,26 @@ const Create = () => {
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
 
+    const [showHarvestConfirmationModal, setShowHarvestConfirmationModal] = useState(false);
+
+    const reset = () => {
+        setCharityName("invalid");
+		setCharityAddress("");
+		setCustomInterestRate("");
+		setInterestRate("invalid");
+		setCurrency("invalid");
+    }
+
+    const initiateHarvest = () => {
+        setShowHarvestConfirmationModal(true);
+    }
+
+    const doHarvest = () => {
+        setModalMessage("Harvested successfully!");
+        setShowHarvestConfirmationModal(false);
+        setShowModal(true);
+    }
+
     let charityFields;
     if (showCustomFields) {
         charityFields = <>
@@ -97,10 +117,22 @@ const Create = () => {
 							</select>
                 </div>
                 <div className="create-buttons-container">
-                    <Button isDark={true}>Reset</Button>
-                    <Button>Harvest</Button>
+                    <Button isDark={true} onClick={reset}>Reset</Button>
+                    <Button onClick={initiateHarvest}>Harvest</Button>
                 </div>
             </div>
+            <Modal show={showHarvestConfirmationModal} buttonText="Confirm Harvest" extraButtonText="Cancel"
+			extraButtonClick={() => setShowHarvestConfirmationModal(false)} handleClose={() => doHarvest()}>
+                <div>
+                    <h2 className="modal-header">Confirm Harvest</h2>
+                    <div>
+                        <span className="modal-span"><strong>Gift Rate:</strong> {showCustomFields ? customInterestRate : interestRate}%</span>
+                    </div>
+                    <div>
+                        <span className="modal-span"><strong>Amount To Harvest:</strong> XXXX {currency}</span>
+                    </div>
+                </div>
+            </Modal>
             <Modal show={showModal} handleClose={() => setShowModal(false)}>
                 <span style={{ "font-size": "18px" }}>
                     {modalMessage}
