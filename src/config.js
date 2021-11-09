@@ -22,3 +22,11 @@ export const Charities = {
 	"Charity 2": "0xBB379331De54A7c0a4b2bfF5A54A14cdba7E9E6d",
 	"Charity 3": "insert-here"
 }
+
+export const interestRateOptions = {
+	5: "5%",
+	10: "10%",
+	15: "15%",
+	20: "20%",
+	25: "25%"
+}

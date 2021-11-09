@@ -9,20 +9,12 @@ import { ethers } from 'ethers';
 import bigInt from "big-integer";
 import Toggle from "react-toggle";
 import { useLocation } from "react-router-dom";
-import { Tokens, Charities } from '../../config'
+import { Tokens, Charities, interestRateOptions } from '../../config'
 import { getCharityVaultFactoryContract, getCharityVaultContract,
 		 getCharityVaultContractAddress, getUnderlyingContractByAddress } from '../../Contracts';
 import "react-toggle/style.css"
 import "./Deposit.css"
 
-
-const interestRateOptions = {
-	5: "5%",
-	10: "10%",
-	15: "15%",
-	20: "20%",
-	25: "25%"
-}
 
 const Deposit = () => {
 	const search = useLocation().search;

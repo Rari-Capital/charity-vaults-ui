@@ -36,6 +36,11 @@ const NavBar = () => {
                                 </NavLink>
                     </li>
                     <li className="nav-item" >
+                        <NavLink exact to="/harvest" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
+                            Harvest
+                        </NavLink>
+                    </li>
+                    <li className="nav-item" >
                         <NavLink exact to="/deposit" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
                             Deposit
                                 </NavLink>
