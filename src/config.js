@@ -20,7 +20,7 @@ export const Tokens = {
 export const Charities = {
 	"Charity 1": "0x05AB381A007A90E541433f3DC574AcD3E389f898",
 	"Charity 2": "0xBB379331De54A7c0a4b2bfF5A54A14cdba7E9E6d",
-	"Charity 3": "insert-here"
+	"Charity 3": "0x77e34153d9CbAD9f457b6DDFa61B721Ec2e92F52"
 }
 
 export const interestRateOptions = {

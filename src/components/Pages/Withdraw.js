@@ -110,9 +110,13 @@ const Withdraw = () => {
 
     const [amountToWithdraw, setAmountToWithdraw] = useState("");
 
-    const getDepositData = async () => {
-        connectCachedProvider(provider, setProvider, setSigner);
+    const handleProvider = async () => {
+        setIsLoadingData(true);
+        await connectCachedProvider(provider, setProvider, setSigner);
+        setIsLoadingData(false);
+    }
 
+    const getDepositData = async () => {
         setIsLoadingData(true);
         const vaultFactoryContract = getCharityVaultFactoryContract(signer);
         const filter = vaultFactoryContract.filters.CharityVaultDeployed(null, null);
@@ -149,7 +153,12 @@ const Withdraw = () => {
     };
 
     if (!gotDepositData && !isLoadingData) {
-        getDepositData();
+        if (!signer) {
+            handleProvider();
+        } else {
+            setIsLoadingData(true);
+            getDepositData();
+        }
     }
 
     const initiateWithdraw = () => {
@@ -180,7 +189,7 @@ const Withdraw = () => {
         } else {
             // Do withdraw
             let charityVault = getCharityVaultContractByAddress(selectedRowInfo.charity_vault_address, signer);
-            await charityVault.withdraw(String(bigInt(amountToWithdraw * (10**18))));
+            await charityVault.withdraw(String(bigInt(amountToWithdraw * (10 ** 18))));
             withdrawMessage = "Withdrew successfully!";
         }
         setShowWithdrawModal(false);
