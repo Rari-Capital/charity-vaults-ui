@@ -167,11 +167,14 @@ const Withdraw = () => {
 
     const doWithdraw = async () => {
         let withdrawMessage;
+		console.log("amount requested withdraw", amountToWithdraw);
+		console.log("amount available", selectedRowInfo.amount);
         if (!amountToWithdraw) {
             withdrawMessage = "Must enter an amount to withdraw";
         } else if (amountToWithdraw <= 0) {
             withdrawMessage = "Must withdraw a positive amount";
-        } else if (amountToWithdraw > selectedRowInfo.amount) {
+        // } else if (amountToWithdraw > selectedRowInfo.amount) {
+		} else if ((parseFloat(amountToWithdraw,10)>parseFloat(selectedRowInfo.amount,10))){
             console.log("Cannot withdraw more than the deposit amount");
             withdrawMessage = "Cannot withdraw more than the deposit amount";
         } else {
