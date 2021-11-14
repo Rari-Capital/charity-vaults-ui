@@ -215,6 +215,9 @@ const Withdraw = () => {
                     <h1 className="withdraw-header">Withdraw</h1>
                     <h6 className="withdraw-subheader">Select one of your deposits to withdraw.</h6>
                 </div>
+                <div className="refresh-container">
+                    <span onClick={() => getDepositData()} className="refresh-span">Refresh Data</span>
+                </div>
                 <div className="table-container">
                     <WithdrawTable data={depositData} columns={columns} selectedRowVaultName={selectedRowVaultName} selectedRowGiftRate={selectedRowGiftRate} setSelectedRowInfo={setSelectedRowInfo} isLoading={isLoadingData} />
                 </div>

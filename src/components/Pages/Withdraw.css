@@ -81,3 +81,16 @@ table th {
     color: white;
     text-align: center;
 }
+
+.refresh-container {
+    width: 100%;
+    text-align: right;
+}
+
+.refresh-span {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
