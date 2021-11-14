@@ -35,6 +35,7 @@ table {
 table td, table th {
     border: 1px solid #ddd;
     padding: 8px;
+    overflow: hidden;
 }
 
 table tr:nth-child(even){background-color: #333333;}

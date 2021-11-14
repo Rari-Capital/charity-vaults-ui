@@ -27,12 +27,16 @@ const withdrawColumns = [
         accessor: 'rate',
     },
     {
-        Header: 'Amount Deposited',
+        Header: 'Balance',
         accessor: 'amount',
     },
+    {
+        Header: 'Interest',
+        accessor: 'interest',
+    }
 ]
 
-const WithdrawTable = ({ columns, data, selectedRowVaultName, setSelectedRowInfo, isLoading }) => {
+const WithdrawTable = ({ columns, data, selectedRowVaultName, selectedRowGiftRate, setSelectedRowInfo, isLoading }) => {
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
         columns: columns,
         data: data,
@@ -46,7 +50,7 @@ const WithdrawTable = ({ columns, data, selectedRowVaultName, setSelectedRowInfo
                 {rows.map(row => {
                     prepareRow(row)
                     return (
-                        <tr {...row.getRowProps()} id={row.original.charity_name === selectedRowVaultName ? "selected-row" : ""}
+                        <tr {...row.getRowProps()} id={row.original.charity_name === selectedRowVaultName && row.original.rate === selectedRowGiftRate ? "selected-row" : ""}
                             onClick={() => setSelectedRowInfo(row.original)}>
                             {row.cells.map((cell) => {
                                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
@@ -98,8 +102,10 @@ const Withdraw = () => {
 
     const [selectedRowInfo, setSelectedRowInfo] = useState(null);
     let selectedRowVaultName;
+    let selectedRowGiftRate;
     if (selectedRowInfo) {
         selectedRowVaultName = selectedRowInfo.charity_name;
+        selectedRowGiftRate = selectedRowInfo.rate;
     }
 
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -135,12 +141,15 @@ const Withdraw = () => {
                 let charity = await charityVault.CHARITY();
                 let underlying = await charityVault.UNDERLYING();
                 let rate = await charityVault.BASE_FEE();
+                // TODO: Get proper amount for the underlying balance (handle rates and stuff)
+                // TODO: fetch amount of interest here
                 newCurrentDeposits.push({
                     "charity_vault_address": event.args.vault,
                     "charity_name": getCharityFromAddress(charity),
                     "token": getTokenFromAddress(underlying),
                     "rate": parseInt(rate),
                     "amount": balance,
+                    "interest": "N/A"
                 });
             }
         };
@@ -196,6 +205,7 @@ const Withdraw = () => {
         setWithdrawErrorModalContent(withdrawMessage);
         setShowWithdrawErrorModal(true);
         setAmountToWithdraw("");
+        // TODO: Make sure to try to refresh the deposit information here
     }
 
     return (
@@ -206,7 +216,7 @@ const Withdraw = () => {
                     <h6 className="withdraw-subheader">Select one of your deposits to withdraw.</h6>
                 </div>
                 <div className="table-container">
-                    <WithdrawTable data={depositData} columns={columns} selectedRowVaultName={selectedRowVaultName} setSelectedRowInfo={setSelectedRowInfo} isLoading={isLoadingData} />
+                    <WithdrawTable data={depositData} columns={columns} selectedRowVaultName={selectedRowVaultName} selectedRowGiftRate={selectedRowGiftRate} setSelectedRowInfo={setSelectedRowInfo} isLoading={isLoadingData} />
                 </div>
                 <div className="withdraw-buttons-container">
                     <Button isDark={true} onClick={() => setSelectedRowInfo(null)}>Deselect</Button>
@@ -221,7 +231,7 @@ const Withdraw = () => {
                         <span className="modal-span"><strong>Gift Rate:</strong> {selectedRowInfo ? selectedRowInfo.rate : ""}%</span>
                     </div>
                     <div>
-                        <span className="modal-span"><strong>Amount Deposited:</strong> {selectedRowInfo ? selectedRowInfo.amount : ""} {selectedRowInfo ? selectedRowInfo.token : ""}</span>
+                        <span className="modal-span"><strong>Balance:</strong> {selectedRowInfo ? selectedRowInfo.amount : ""} {selectedRowInfo ? selectedRowInfo.token : ""}</span>
                     </div>
                     <div>
                         <span className="modal-span" style={{ "text-decoration": "underline" }}><strong>Amount To Withdraw</strong></span>
