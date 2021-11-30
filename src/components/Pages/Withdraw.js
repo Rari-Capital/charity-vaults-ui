@@ -136,6 +136,9 @@ const Withdraw = () => {
             let charityVault = getCharityVaultContractByAddress(event.args.vault, signer);
             let balance = await charityVault.balanceOf(provider.provider.selectedAddress);
             balance = ethers.utils.formatEther(balance);
+            let exchangeRate = await charityVault.exchangeRate();
+            exchangeRate = ethers.utils.formatEther(exchangeRate);
+            let adjusted_balance = balance * exchangeRate;
             if (balance > 0) {
                 // Build deposit object
                 let charity = await charityVault.CHARITY();
@@ -148,7 +151,7 @@ const Withdraw = () => {
                     "charity_name": getCharityFromAddress(charity),
                     "token": getTokenFromAddress(underlying),
                     "rate": parseInt(rate),
-                    "amount": balance,
+                    "amount": adjusted_balance,
                     "interest": "N/A"
                 });
             }
