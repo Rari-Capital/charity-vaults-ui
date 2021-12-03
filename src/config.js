@@ -1,6 +1,6 @@
 import charityVaultABI from './contracts/CharityVault.sol/CharityVault.json';
 import charityVaultFactoryABI from './contracts/CharityVaultFactory.sol/CharityVaultFactory.json';
-import underlyingABI from './contracts/DemoUSD.sol/DemoUSD.json';
+import underlyingABI from './contracts/FakeUSD.sol/FakeUSD.json';
 
 export const CharityVaultABI = charityVaultABI;
 export const CharityVaultFactoryABI = charityVaultFactoryABI;
@@ -12,7 +12,7 @@ export const WalletConnectInfuraId = "782109c6748c48d6b91c3eafa72b5292";
 export const Network = "goerli";
 
 export const Tokens = {
-    "DUSD": "0x9D0230d259fA6315eCDf5972e4C635babf02599c",
+    "FUSD": "0xb983C7a6f63623743CeB2F485118a37C9f77d2a0",
     "USDC": "0x5ffbac75efc9547fbc822166fed19b05cd5890bb",
     "ETH": "insert-here",
 }
