@@ -96,9 +96,10 @@ const Deposit = () => {
 			} else {
 				// If contract exists, check if user needs to approve tokens or not
 				let allowance = await underlyingContract.allowance(signer.getAddress(), charityVaultContractAddress);
+				allowance = ethers.utils.formatEther(allowance);
 
 				// User has allowance to deposit underlying
-				if (allowance >= ethers.BigNumber.from(String(bigInt(depositAmount * (10**18))))) {
+				if (allowance >= parseFloat(depositAmount)) {
 					setShowDepositConfirmationModal(true);
 					setIsApproved(true);
 					
