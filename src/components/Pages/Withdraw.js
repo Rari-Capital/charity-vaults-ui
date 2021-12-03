@@ -137,7 +137,7 @@ const Withdraw = () => {
             let balance = await charityVault.balanceOfUnderlying(provider.provider.selectedAddress);
             balance = ethers.utils.formatEther(balance);
 
-            if (balance > 0) {
+            if (balance > 0.001) {
                 // Build deposit object
                 let charity = await charityVault.CHARITY();
                 let underlying = await charityVault.UNDERLYING();
@@ -149,7 +149,7 @@ const Withdraw = () => {
                     "charity_name": getCharityFromAddress(charity),
                     "token": getTokenFromAddress(underlying),
                     "rate": parseInt(rate),
-                    "amount": balance,
+                    "amount": parseFloat(parseFloat(balance).toFixed(3)),
                     "interest": "N/A"
                 });
             }
@@ -186,15 +186,12 @@ const Withdraw = () => {
 
     const doWithdraw = async () => {
         let withdrawMessage;
-		console.log("amount requested withdraw", amountToWithdraw);
-		console.log("amount available", selectedRowInfo.amount);
         if (!amountToWithdraw) {
             withdrawMessage = "Must enter an amount to withdraw";
         } else if (amountToWithdraw <= 0) {
             withdrawMessage = "Must withdraw a positive amount";
         // } else if (amountToWithdraw > selectedRowInfo.amount) {
 		} else if ((parseFloat(amountToWithdraw,10)>parseFloat(selectedRowInfo.amount,10))){
-            console.log("Cannot withdraw more than the deposit amount");
             withdrawMessage = "Cannot withdraw more than the deposit amount";
         } else {
             // Do withdraw
@@ -234,7 +231,7 @@ const Withdraw = () => {
                     <div>
                         <span className="modal-span"><strong>Gift Rate:</strong> {selectedRowInfo ? selectedRowInfo.rate : ""}%</span>
                     </div>
-                    <div>
+                    <div style={{"cursor": "pointer"}} onClick={selectedRowInfo ? () => setAmountToWithdraw(selectedRowInfo.amount) : () => setAmountToWithdraw("")}>
                         <span className="modal-span"><strong>Balance:</strong> {selectedRowInfo ? selectedRowInfo.amount : ""} {selectedRowInfo ? selectedRowInfo.token : ""}</span>
                     </div>
                     <div>
