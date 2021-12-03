@@ -36,8 +36,8 @@ const NavBar = () => {
                                 </NavLink>
                     </li>
                     <li className="nav-item" >
-                        <NavLink exact to="/harvest" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
-                            Harvest
+                        <NavLink exact to="/extract" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
+                            Extract
                         </NavLink>
                     </li>
                     <li className="nav-item" >

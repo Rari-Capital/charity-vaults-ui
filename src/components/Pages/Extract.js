@@ -11,7 +11,7 @@ import { getCharityVaultFactoryContract, getCharityVaultContract } from '../../C
 import "./Create.css"
 
 
-const Create = () => {
+const Extract = () => {
     const context = useContext(RariContext);
     const provider = context.web3provider;
     const signer = context.web3signer;
@@ -19,35 +19,94 @@ const Create = () => {
     const [showCustomFields, setShowCustomFields] = useState(false);
 
     // Pre-select fields
-	const [charityName, setCharityName] = useState("invalid");
-	const [interestRate, setInterestRate] = useState("invalid");
+    const [charityName, setCharityName] = useState("invalid");
+    const [interestRate, setInterestRate] = useState("invalid");
 
-	// Custom fields
-	const [charityAddress, setCharityAddress] = useState(null);
+    // Custom fields
+    const [charityAddress, setCharityAddress] = useState(null);
     const [customInterestRate, setCustomInterestRate] = useState(null);
-    
+
     const [currency, setCurrency] = useState("invalid");
 
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState(null);
 
-    const [showHarvestConfirmationModal, setShowHarvestConfirmationModal] = useState(false);
+    const [showExtractionConfirmationModal, setShowExtractionConfirmationModal] = useState(false);
 
     const reset = () => {
         setCharityName("invalid");
-		setCharityAddress("");
-		setCustomInterestRate("");
-		setInterestRate("invalid");
-		setCurrency("invalid");
+        setCharityAddress("");
+        setCustomInterestRate("");
+        setInterestRate("invalid");
+        setCurrency("invalid");
     }
 
-    const initiateHarvest = () => {
-        setShowHarvestConfirmationModal(true);
+    const initiateExtraction = () => {
+        let message;
+        let errorOccurred;
+        let selectedAddress;
+        let selectedInterestRate;
+        if (showCustomFields) {
+            if (!charityAddress) {
+                message = "Must provide a charity wallet address.";
+                errorOccurred = true;
+            } else if (!customInterestRate || customInterestRate <= 0 || customInterestRate >= 100) {
+                message = "Must provide a valid gift rate.";
+                errorOccurred = true;
+            } else {
+                selectedAddress = charityAddress;
+                selectedInterestRate = customInterestRate;
+            }
+        } else {
+            if (!charityName || charityName === "invalid") {
+                message = "Must select a charity.";
+                errorOccurred = true;
+            } else if (!interestRate || interestRate === "invalid") {
+                message = "Must select a gift rate.";
+                errorOccurred = true;
+            } else {
+                selectedAddress = Charities[charityName];
+                selectedInterestRate = interestRate;
+            }
+        }
+
+        if (!errorOccurred) {
+            if (!currency || currency === "invalid") {
+                errorOccurred = true;
+                message = "Must select a currency.";
+            }
+        }
+
+        if (errorOccurred) {
+            setModalMessage(message);
+            setShowModal(true);
+        } else {
+            setShowExtractionConfirmationModal(true);
+        }
     }
 
-    const doHarvest = () => {
-        setModalMessage("Harvested successfully!");
-        setShowHarvestConfirmationModal(false);
+    const doExtract = async () => {
+        let selectedAddress;
+        let selectedInterestRate;
+
+        if(showCustomFields) {
+            selectedAddress = charityAddress;
+            selectedInterestRate = customInterestRate;
+        } else {
+            selectedAddress = Charities[charityName];
+            selectedInterestRate = interestRate;
+        }
+
+
+        const charityVaultContract = await getCharityVaultContract(Tokens[currency], selectedAddress, selectedInterestRate, signer);
+
+        if(!charityVaultContract) {
+            setModalMessage("A charity vault does not exist with the provided information.");
+        } else {
+            await charityVaultContract.withdrawInterestToCharity();
+            setModalMessage("Extracted successfully!");
+            setShowExtractionConfirmationModal(false);
+        }
         setShowModal(true);
     }
 
@@ -106,30 +165,30 @@ const Create = () => {
                     {charityFields}
                 </div>
                 <div>
-                <InputHeader value="SELECT CURRENCY" />
-							<select id="selectCurrency" value={currency}
-								onChange={(event) => setCurrency(event.target.value)}
-								className="dropdown-container">
-								<option value="invalid">N/A</option>
-								{Object.keys(Tokens).map(key => (
-									<option value={key}>{key}</option>
-								))}
-							</select>
+                    <InputHeader value="SELECT CURRENCY" />
+                    <select id="selectCurrency" value={currency}
+                        onChange={(event) => setCurrency(event.target.value)}
+                        className="dropdown-container">
+                        <option value="invalid">N/A</option>
+                        {Object.keys(Tokens).map(key => (
+                            <option value={key}>{key}</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="create-buttons-container">
                     <Button isDark={true} onClick={reset}>Reset</Button>
-                    <Button onClick={initiateHarvest}>Harvest</Button>
+                    <Button onClick={initiateExtraction}>Extract</Button>
                 </div>
             </div>
-            <Modal show={showHarvestConfirmationModal} buttonText="Confirm Harvest" extraButtonText="Cancel"
-			extraButtonClick={() => setShowHarvestConfirmationModal(false)} handleClose={() => doHarvest()}>
+            <Modal show={showExtractionConfirmationModal} buttonText="Confirm Extraction" extraButtonText="Cancel"
+                extraButtonClick={() => setShowExtractionConfirmationModal(false)} handleClose={() => doExtract()}>
                 <div>
-                    <h2 className="modal-header">Confirm Harvest</h2>
+                    <h2 className="modal-header">Confirm Extraction</h2>
                     <div>
                         <span className="modal-span"><strong>Gift Rate:</strong> {showCustomFields ? customInterestRate : interestRate}%</span>
                     </div>
                     <div>
-                        <span className="modal-span"><strong>Amount To Harvest:</strong> XXXX {currency}</span>
+                        <span className="modal-span"><strong>About to Extract {currency} from Charity Vault</strong></span>
                     </div>
                 </div>
             </Modal>
@@ -142,4 +201,4 @@ const Create = () => {
     )
 }
 
-export default Create;
+export default Extract;
