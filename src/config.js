@@ -6,7 +6,7 @@ export const CharityVaultABI = charityVaultABI;
 export const CharityVaultFactoryABI = charityVaultFactoryABI;
 export const UnderlyingABI = underlyingABI;
 
-export const CharityVaultFactoryDeployedAddress = "0x94946353a1cb8949b7e1ab214ddBB77CCEDFDFe1";
+export const CharityVaultFactoryDeployedAddress = "0x8c50A6a21Be7375026D0412BE3B2c933e2055BcC";
 
 export const WalletConnectInfuraId = "782109c6748c48d6b91c3eafa72b5292";
 export const Network = "goerli";
