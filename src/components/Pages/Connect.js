@@ -77,7 +77,7 @@ const Connect = () => {
     return (
         <Page>
             <div className="connect-card-container">
-                <Card name="Connected Address" value={provider ? provider.provider.selectedAddress : "XXXXXXXXXXXXXXXXXXXXX"} />
+                <Card name="Connected Address" value={provider ? provider.provider.selectedAddress : "----"} />
             </div>
             <div className="connect-card-container">
                 <Card name="Wallet Provider" value={connectedProviderName} />

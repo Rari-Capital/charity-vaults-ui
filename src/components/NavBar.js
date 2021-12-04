@@ -1,10 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { NavLink } from 'react-router-dom'
 import rariLogo from '../images/rari.png'
+import RariContext from '../Context';
 import "./NavBar.css"
 
 const NavBar = () => {
     const [isOpen, setOpen] = useState(false);
+
+    const context = useContext(RariContext);
+	const provider = context.web3provider;
+	const signer = context.web3signer;
 
     const handleClick = () => {
         setOpen(!isOpen);
@@ -13,6 +18,26 @@ const NavBar = () => {
     const handleLinkClick = () => {
         if(isOpen) {
             setOpen(false);
+        }
+    }
+
+    const displayWallet = () => {
+        if (provider) {
+            return (
+                <div className="nav-button">
+                    <NavLink exact to="/connect" activeClassName="active" className="nav-links button-links" style={{textDecoration: "none"}} onClick={handleLinkClick}>
+                        {provider.provider.selectedAddress.substring(0, 5) + "..." + provider.provider.selectedAddress.substring(38, 42)}
+                    </NavLink>
+                </div>
+            )
+        } else {
+            return (
+                <div className="nav-button">
+                    <NavLink exact to="/connect" activeClassName="active" className="nav-links button-links" style={{textDecoration: "none"}} onClick={handleLinkClick}>
+                        Connect
+                    </NavLink>
+                </div>
+            )
         }
     }
 
@@ -33,7 +58,7 @@ const NavBar = () => {
                     <li className="nav-item" >
                         <NavLink exact to="/create" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
                             Create
-                                </NavLink>
+                        </NavLink>
                     </li>
                     <li className="nav-item" >
                         <NavLink exact to="/extract" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
@@ -43,19 +68,15 @@ const NavBar = () => {
                     <li className="nav-item" >
                         <NavLink exact to="/deposit" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
                             Deposit
-                                </NavLink>
+                        </NavLink>
                     </li>
                     <li className="nav-item" >
                         <NavLink exact to="/withdraw" activeClassName="active" className="nav-links" onClick={handleLinkClick}>
                             Withdraw
-                                </NavLink>
+                        </NavLink>
                     </li>
                     <li className="nav-button-item" >
-                        <div className="nav-button">
-                        <NavLink exact to="/connect" activeClassName="active" className="nav-links button-links" onClick={handleLinkClick}>
-                            Connect
-                                </NavLink>
-                                </div>
+                        {displayWallet()}
                     </li>
                 </ul>
                 <div className="nav-icon" onClick={handleClick}>
